@@ -1,0 +1,3294 @@
+.play-shell {
+  min-height: 100vh;
+  padding: 22px;
+  color: #664236;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 233, 201, 0.72), transparent 20%),
+    radial-gradient(circle at 86% 22%, rgba(255, 214, 223, 0.5), transparent 18%),
+    radial-gradient(circle at 72% 78%, rgba(212, 237, 255, 0.42), transparent 20%),
+    linear-gradient(180deg, #fff6eb, #f6e6d4 65%, #f2dcc8);
+}
+
+.top-bar,
+.speech-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.speech-row {
+  margin: 16px 0 18px;
+}
+
+.eyebrow,
+.panel-kicker {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #ca6880;
+}
+
+.brand h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 6vw, 4.8rem);
+  color: #86483b;
+}
+
+.score-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.score-pill,
+.speech-bubble,
+.cat-button,
+.ingredient-block {
+  background: rgba(255, 251, 247, 0.94);
+  box-shadow: 0 18px 32px rgba(121, 89, 73, 0.1);
+}
+
+.score-pill {
+  min-width: 96px;
+  padding: 12px 14px;
+  text-align: center;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+}
+
+.score-pill span,
+.speech-bubble small,
+.cat-button strong,
+.order-hero small,
+.recipe-checklist small,
+.prep-copy small,
+.active-chef-card small,
+.support-chef-card small,
+.ingredient-block small {
+  color: #9f7565;
+}
+
+.score-pill strong,
+.speech-bubble strong,
+.order-hero strong,
+.recipe-checklist strong,
+.prep-copy strong,
+.active-chef-card strong,
+.support-chef-card strong,
+.ingredient-block strong,
+.finish-action strong {
+  color: #6d4134;
+}
+
+.speech-bubble {
+  position: relative;
+  flex: 1;
+  padding: 22px 24px;
+  border-radius: 34px;
+  border: 4px solid var(--accent, #df7c69);
+  background: linear-gradient(180deg, rgba(255, 255, 252, 0.98), rgba(255, 244, 238, 0.96));
+  box-shadow:
+    0 22px 34px rgba(121, 89, 73, 0.1),
+    0 0 0 10px rgba(255, 255, 255, 0.34);
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  right: 34px;
+  bottom: -16px;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 244, 238, 0.96);
+  border-right: 4px solid var(--accent, #df7c69);
+  border-bottom: 4px solid var(--accent, #df7c69);
+  transform: rotate(45deg);
+}
+
+.speech-bubble p {
+  margin: 8px 0 10px;
+  font-size: 1.28rem;
+  line-height: 1.25;
+}
+
+.cat-button {
+  width: 220px;
+  padding: 18px;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  text-align: center;
+  border: 0;
+  cursor: pointer;
+  border-radius: 34px;
+  background: linear-gradient(180deg, #fffdfa, #fff2e7);
+  box-shadow:
+    0 20px 30px rgba(121, 89, 73, 0.1),
+    0 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.cat-art {
+  width: 138px;
+  height: 96px;
+  object-fit: cover;
+  object-position: center 62%;
+  border-radius: 24px;
+}
+
+.cat-button.active {
+  background: linear-gradient(180deg, rgba(255, 232, 233, 0.98), rgba(255, 247, 243, 0.96));
+  outline: 3px solid rgba(202, 104, 128, 0.26);
+}
+
+.stage-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr) 320px;
+  gap: 18px;
+  align-items: start;
+}
+
+.recipe-sidebar,
+.prep-stage,
+.chef-sidebar {
+  display: grid;
+  gap: 14px;
+}
+
+.order-card {
+  position: relative;
+  padding: 20px;
+  border-radius: 34px 34px 40px 36px;
+  background:
+    linear-gradient(180deg, rgba(255, 247, 239, 0.98), rgba(255, 251, 247, 0.98)),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 208, 197, 0.08) 0,
+      rgba(255, 208, 197, 0.08) 18px,
+      rgba(255, 255, 255, 0.1) 18px,
+      rgba(255, 255, 255, 0.1) 36px
+    );
+  box-shadow:
+    0 24px 34px rgba(121, 89, 73, 0.11),
+    inset 0 0 0 2px rgba(252, 223, 208, 0.75);
+  transform: rotate(-1.3deg);
+}
+
+.tape {
+  position: absolute;
+  top: -14px;
+  width: 64px;
+  height: 24px;
+  border-radius: 8px;
+  background: rgba(255, 228, 151, 0.58);
+  box-shadow: 0 4px 10px rgba(150, 114, 72, 0.08);
+}
+
+.tape-left {
+  left: 30px;
+  transform: rotate(-12deg);
+}
+
+.tape-right {
+  right: 26px;
+  transform: rotate(14deg);
+}
+
+.order-hero {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.order-hero strong,
+.recipe-checklist strong,
+.support-chef-card strong,
+.ingredient-block strong {
+  display: block;
+}
+
+.order-hero small,
+.recipe-checklist small,
+.support-chef-card small,
+.ingredient-block small {
+  display: block;
+  line-height: 1.25;
+}
+
+.order-thumb {
+  width: 82px;
+  height: 82px;
+  flex: 0 0 82px;
+  border-radius: 24px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.recipe-checklist {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.recipe-checklist li {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 2px solid rgba(255, 243, 236, 0.95);
+}
+
+.recipe-checklist li.current {
+  background: rgba(239, 255, 239, 0.92);
+}
+
+.recipe-checklist li.done {
+  background: rgba(255, 238, 228, 0.96);
+}
+
+.recipe-checklist li.done strong {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.ingredient-badge {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ingredient-tint, #ffe39f) 88%, white),
+    rgba(255, 255, 255, 0.9)
+  );
+  box-shadow: inset 0 -8px 16px rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+}
+
+.ingredient-badge img {
+  width: 150%;
+  height: 150%;
+  object-fit: contain;
+}
+
+.prep-dropzone {
+  position: relative;
+  min-height: 590px;
+  padding: 22px;
+  display: grid;
+  align-content: space-between;
+  gap: 18px;
+  cursor: pointer;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(255, 239, 201, 0.82), rgba(255, 251, 247, 0) 52%),
+    radial-gradient(circle at 12% 82%, rgba(255, 215, 228, 0.28), rgba(255, 255, 255, 0) 24%),
+    linear-gradient(180deg, rgba(255, 250, 244, 0.98), rgba(255, 245, 236, 0.96));
+  border-radius: 56px 56px 44px 44px;
+  box-shadow:
+    0 30px 40px rgba(121, 89, 73, 0.1),
+    inset 0 0 0 4px rgba(255, 255, 255, 0.75);
+}
+
+.prep-dropzone.waiting {
+  outline: 4px dashed rgba(121, 179, 148, 0.22);
+}
+
+.prep-dropzone.complete {
+  outline: 4px dashed rgba(223, 124, 105, 0.22);
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 1.4rem;
+  color: rgba(255, 201, 88, 0.7);
+}
+
+.sparkle-a {
+  top: 28px;
+  left: 38px;
+}
+
+.sparkle-b {
+  top: 42px;
+  right: 48px;
+}
+
+.sparkle-c {
+  bottom: 108px;
+  right: 74px;
+}
+
+.prep-copy {
+  text-align: center;
+}
+
+.prep-copy strong {
+  display: block;
+  font-size: 1.6rem;
+  margin-bottom: 6px;
+}
+
+.live-dish {
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.finish-action {
+  border: 0;
+  padding: 18px;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 999px;
+  background:
+    linear-gradient(135deg, #ffd9c8, #fff0e6),
+    linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0));
+  box-shadow:
+    0 24px 30px rgba(121, 89, 73, 0.11),
+    0 0 0 10px rgba(255, 255, 255, 0.28);
+}
+
+.finish-action img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+}
+
+.active-chef-card {
+  position: relative;
+  padding: 20px;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  text-align: center;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--chef-accent, #df7c69) 16%, white),
+    rgba(255, 251, 247, 0.98)
+  );
+  border-radius: 42px 42px 34px 46px;
+  box-shadow:
+    0 28px 34px rgba(121, 89, 73, 0.11),
+    0 0 0 8px rgba(255, 255, 255, 0.28);
+}
+
+.sticker-badge {
+  position: absolute;
+  top: -12px;
+  right: 22px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #ffec89;
+  color: #8f5b21;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 16px rgba(164, 120, 54, 0.14);
+}
+
+.chef-portrait {
+  width: 238px;
+  height: 300px;
+  border-radius: 34px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.chef-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+}
+
+.active-chef-card strong {
+  font-size: 1.8rem;
+}
+
+.active-chef-card p {
+  margin: 0;
+  font-size: 1.12rem;
+  color: #7c5245;
+}
+
+.chef-order-tag {
+  margin-top: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.76);
+  color: #7b4a3d;
+  font-weight: 800;
+}
+
+.support-chef-card {
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-radius: 30px;
+  background: linear-gradient(180deg, #fffdfa, #fff2e9);
+  box-shadow:
+    0 18px 28px rgba(121, 89, 73, 0.08),
+    0 0 0 6px rgba(255, 255, 255, 0.25);
+}
+
+.support-chef-card span {
+  width: 68px;
+  height: 68px;
+  flex: 0 0 68px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffe1cf, #fff4ea);
+}
+
+.support-chef-card img {
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  object-position: center 34%;
+}
+
+.ingredient-row {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.ingredient-stage {
+  position: relative;
+  width: min(100%, 980px);
+  aspect-ratio: 1 / 1;
+  margin: 22px auto 0;
+  overflow: hidden;
+  border-radius: 34px;
+  background: #f5dcc4;
+  box-shadow:
+    0 30px 48px rgba(121, 89, 73, 0.14),
+    0 0 0 8px rgba(255, 255, 255, 0.22);
+  isolation: isolate;
+}
+
+.ingredient-stage-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+}
+
+.table-ingredient {
+  position: absolute;
+  z-index: 2;
+  border: 0;
+  border-radius: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+}
+
+.table-ingredient::before {
+  content: '';
+  position: absolute;
+  inset: -8%;
+  border-radius: 32px;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.08) 62%, transparent 72%),
+    color-mix(in srgb, var(--ingredient-tint, #ffe39f) 24%, transparent);
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.table-ingredient img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 10px rgba(120, 70, 50, 0.12));
+  transition: opacity 140ms ease, transform 140ms ease, filter 140ms ease;
+}
+
+.table-ingredient.highlighted img {
+  filter: drop-shadow(0 8px 12px rgba(121, 179, 148, 0.22));
+}
+
+.table-ingredient:hover img,
+.table-ingredient:focus-visible img,
+.table-ingredient.selected img {
+  opacity: 1;
+  transform: translateY(-4px) scale(1.04);
+  filter: drop-shadow(0 10px 14px rgba(120, 70, 50, 0.18));
+}
+
+.table-ingredient:hover::before,
+.table-ingredient:focus-visible::before,
+.table-ingredient.selected::before,
+.table-ingredient.highlighted::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.table-ingredient:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ingredient-accent, #df7c69) 70%, white);
+  outline-offset: 5px;
+}
+
+.table-ingredient:active {
+  cursor: grabbing;
+}
+
+.table-ingredient.dragging {
+  opacity: 0.48;
+}
+
+.ingredient-block {
+  border: 0;
+  padding: 14px;
+  display: grid;
+  grid-template-rows: 116px auto auto;
+  gap: 10px;
+  min-height: 204px;
+  text-align: center;
+  cursor: grab;
+  border-radius: 34px 34px 28px 36px;
+  background: rgba(255, 251, 247, 0.96);
+  box-shadow:
+    0 20px 26px rgba(121, 89, 73, 0.1),
+    0 0 0 6px rgba(255, 255, 255, 0.3);
+}
+
+.ingredient-top {
+  height: 116px;
+  border-radius: 30px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 25%, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0) 48%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ingredient-tint, #ffe39f) 88%, white),
+      color-mix(in srgb, var(--ingredient-accent, #f1b942) 12%, white)
+    );
+}
+
+.ingredient-top img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 10px rgba(111, 77, 61, 0.1));
+}
+
+.ingredient-block strong {
+  align-self: end;
+  line-height: 1.15;
+}
+
+.ingredient-block small {
+  min-height: 1.35em;
+}
+
+.ingredient-block.selected {
+  outline: 3px solid rgba(202, 104, 128, 0.24);
+  transform: translateY(-4px) rotate(-1deg);
+}
+
+.ingredient-block.highlighted {
+  outline: 3px solid rgba(121, 179, 148, 0.22);
+  transform: translateY(-3px) rotate(1deg);
+}
+
+.ingredient-block.dragging {
+  opacity: 0.55;
+}
+
+.cookie-preview {
+  width: 100%;
+}
+
+.image-dish {
+  width: min(440px, 82vw);
+  aspect-ratio: 1;
+  min-height: 0;
+  margin: 0 auto;
+}
+
+.dish-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 180ms ease, transform 180ms ease;
+  filter: drop-shadow(0 24px 18px rgba(105, 73, 56, 0.12));
+}
+
+.dish-layer.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.cookie-base,
+.cookie-sugar,
+.cookie-icing,
+.pancake-stack,
+.berry-layer,
+.cream-top,
+.latte-layer,
+.soda-layer {
+  opacity: 0.2;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.cookie-base.visible,
+.cookie-sugar.visible,
+.cookie-icing.visible,
+.pancake-stack.visible,
+.berry-layer.visible,
+.cream-top.visible,
+.latte-layer.visible,
+.soda-layer.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cookie-base {
+  width: 220px;
+  height: 220px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255, 245, 211, 0.98), rgba(220, 166, 102, 0.98) 68%),
+    #ddb061;
+  box-shadow: inset -18px -20px 0 rgba(165, 111, 65, 0.16);
+  transform: rotate(-6deg);
+}
+
+.cookie-sugar {
+  position: absolute;
+  top: 86px;
+  font-size: 2rem;
+  color: #fff;
+  letter-spacing: 0.45em;
+}
+
+.cookie-icing {
+  position: absolute;
+  top: 124px;
+  font-size: 3.4rem;
+}
+
+.pancake-preview {
+  width: 100%;
+}
+
+.plate {
+  position: absolute;
+  bottom: 42px;
+  width: 300px;
+  height: 56px;
+  border-radius: 999px;
+  background: #fff5ef;
+  box-shadow: inset 0 -10px 0 rgba(220, 198, 186, 0.55);
+}
+
+.pancake-stack {
+  position: absolute;
+  bottom: 78px;
+  width: 220px;
+  height: 112px;
+  border-radius: 120px 120px 82px 82px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #efc37d 0,
+      #efc37d 24px,
+      #dfa75d 24px,
+      #dfa75d 34px
+    );
+  transform: rotate(-2deg);
+}
+
+.berry-layer {
+  position: absolute;
+  bottom: 146px;
+  font-size: 2.2rem;
+}
+
+.cream-top {
+  position: absolute;
+  bottom: 188px;
+  font-size: 3rem;
+}
+
+.cup-outline,
+.glass-outline {
+  position: relative;
+  width: 210px;
+  height: 270px;
+  border-radius: 30px 30px 44px 44px;
+  border: 10px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.28);
+  overflow: hidden;
+}
+
+.latte-preview .cup-outline::after {
+  content: '';
+  position: absolute;
+  right: -42px;
+  top: 80px;
+  width: 54px;
+  height: 84px;
+  border: 10px solid rgba(255, 255, 255, 0.75);
+  border-left: 0;
+  border-radius: 0 34px 34px 0;
+}
+
+.latte-layer,
+.soda-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+}
+
+.latte-layer.matcha {
+  bottom: 0;
+  height: 42%;
+  background: linear-gradient(180deg, #a6cd83, #83ad62);
+}
+
+.latte-layer.milk {
+  bottom: 42%;
+  height: 28%;
+  background: linear-gradient(180deg, #fffef9, #ece7da);
+}
+
+.latte-layer.honey {
+  top: 28px;
+  font-size: 2.6rem;
+}
+
+.soda-layer.syrup {
+  bottom: 0;
+  height: 32%;
+  background: linear-gradient(180deg, #f89aab, #ea6e88);
+}
+
+.soda-layer.bubbles {
+  bottom: 34%;
+  height: 34%;
+  font-size: 2.4rem;
+  color: #70cde0;
+}
+
+.soda-layer.ice {
+  top: 34px;
+  font-size: 2rem;
+}
+
+.ingredient-block:hover,
+.finish-action:hover,
+.cat-button:hover,
+.prep-dropzone:hover {
+  transform: translateY(-2px);
+}
+
+.order-card:hover,
+.active-chef-card:hover,
+.support-chef-card:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 1120px) {
+  .stage-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-sidebar,
+  .chef-sidebar {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+@media (max-width: 900px) {
+  .top-bar,
+  .speech-row {
+    display: grid;
+  }
+
+  .cat-button {
+    width: 100%;
+  }
+
+  .ingredient-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .play-shell {
+    padding: 16px;
+  }
+
+  .recipe-sidebar,
+  .chef-sidebar,
+  .ingredient-row {
+    grid-template-columns: 1fr;
+  }
+
+  .prep-dropzone {
+    min-height: 520px;
+  }
+}
+
+.play-shell {
+  min-height: 100vh;
+  padding: 14px;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+}
+
+.game-stage {
+  position: relative;
+  width: min(calc(100vw - 28px), calc(100vh - 28px), 1120px);
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  color: #664236;
+  user-select: none;
+  -webkit-user-select: none;
+  border-radius: 32px;
+  background-image: url('/assets/backgrounds/kawaii-bakery-table.png');
+  background-size: cover;
+  background-position: center;
+  box-shadow:
+    0 30px 70px rgba(126, 84, 57, 0.22),
+    0 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.game-stage *,
+.game-stage *::before,
+.game-stage *::after {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.game-stage img {
+  -webkit-user-drag: none;
+}
+
+.game-stage .top-bar {
+  position: absolute;
+  z-index: 8;
+  top: 2.1%;
+  left: 3%;
+  right: 3%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.2%;
+}
+
+.game-stage .brand h1 {
+  font-size: clamp(1.75rem, 4.8vw, 4.1rem);
+  line-height: 0.95;
+  text-shadow: 0 4px 0 rgba(255, 255, 255, 0.28);
+}
+
+.game-stage .eyebrow,
+.game-stage .panel-kicker {
+  margin-bottom: 0.35rem;
+  font-size: clamp(0.5rem, 0.85vw, 0.72rem);
+}
+
+.game-stage .score-pills {
+  gap: 0.7vw;
+  justify-content: flex-end;
+}
+
+.game-stage .score-pill {
+  min-width: 0;
+  padding: 0.65vw 0.85vw;
+  font-size: clamp(0.65rem, 1.05vw, 0.95rem);
+  background: rgba(255, 251, 247, 0.78);
+}
+
+.game-stage .speech-row {
+  position: absolute;
+  z-index: 7;
+  top: 13.2%;
+  left: 22%;
+  width: 55%;
+  margin: 0;
+  display: block;
+}
+
+.game-stage .speech-bubble {
+  padding: 1.25vw 1.45vw;
+  border-width: 3px;
+  border-radius: 26px;
+  background: rgba(255, 251, 247, 0.78);
+  backdrop-filter: blur(3px);
+  box-shadow:
+    0 14px 26px rgba(121, 89, 73, 0.1),
+    0 0 0 7px rgba(255, 255, 255, 0.18);
+}
+
+.game-stage .speech-bubble::after {
+  right: 9%;
+  bottom: -11px;
+  width: 22px;
+  height: 22px;
+  border-width: 3px;
+  background: rgba(255, 251, 247, 0.78);
+}
+
+.game-stage .speech-bubble p {
+  margin: 0.45rem 0 0.3rem;
+  font-size: clamp(0.78rem, 1.35vw, 1.18rem);
+}
+
+.game-stage .speech-bubble small,
+.game-stage .speech-bubble strong {
+  font-size: clamp(0.62rem, 0.95vw, 0.9rem);
+}
+
+.game-stage .recipe-sidebar {
+  position: absolute;
+  z-index: 6;
+  left: 2.7%;
+  top: 27%;
+  width: 23%;
+  display: block;
+}
+
+.game-stage .order-card {
+  padding: 1.25vw;
+  border-radius: 28px;
+  background: rgba(255, 251, 247, 0.7);
+  backdrop-filter: blur(3px);
+}
+
+.game-stage .order-hero {
+  gap: 0.8vw;
+  margin-bottom: 0.85vw;
+}
+
+.game-stage .order-thumb {
+  width: 4.9vw;
+  height: 4.9vw;
+  min-width: 48px;
+  min-height: 48px;
+  flex-basis: auto;
+}
+
+.game-stage .recipe-checklist {
+  gap: 0.65vw;
+}
+
+.game-stage .recipe-checklist li {
+  gap: 0.7vw;
+  padding: 0.65vw;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.game-stage .ingredient-badge {
+  width: 3.2vw;
+  height: 3.2vw;
+  min-width: 34px;
+  min-height: 34px;
+  flex-basis: auto;
+}
+
+.game-stage .recipe-checklist strong,
+.game-stage .recipe-checklist small,
+.game-stage .order-hero strong,
+.game-stage .order-hero small {
+  font-size: clamp(0.58rem, 0.95vw, 0.86rem);
+}
+
+.game-stage .prep-stage {
+  position: absolute;
+  z-index: 5;
+  left: 25.5%;
+  top: 44.7%;
+  width: 54.5%;
+  height: 33%;
+  display: block;
+}
+
+.game-stage .prep-dropzone {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 1.15vw;
+  align-content: space-between;
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.16) 58%),
+    rgba(255, 245, 238, 0.28);
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 255, 255, 0.42),
+    0 18px 34px rgba(121, 89, 73, 0.08);
+}
+
+.game-stage .prep-dropzone.waiting {
+  outline: 3px dashed rgba(121, 179, 148, 0.34);
+}
+
+.game-stage .prep-dropzone.complete {
+  outline: 3px dashed rgba(223, 124, 105, 0.32);
+}
+
+.game-stage .prep-copy strong {
+  font-size: clamp(0.9rem, 1.55vw, 1.5rem);
+}
+
+.game-stage .prep-copy small {
+  font-size: clamp(0.6rem, 0.95vw, 0.85rem);
+}
+
+.game-stage .live-dish {
+  min-height: 0;
+  height: 72%;
+}
+
+.game-stage .image-dish {
+  width: min(74%, 340px);
+}
+
+.game-stage .finish-action {
+  position: absolute;
+  z-index: 11;
+  left: 50%;
+  bottom: -12%;
+  transform: translateX(-50%);
+  min-width: 34%;
+  padding: 0.65vw 1.1vw;
+  border-radius: 999px;
+  background: rgba(255, 230, 217, 0.82);
+  backdrop-filter: blur(3px);
+}
+
+.game-stage .finish-action:hover {
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.game-stage .finish-action img {
+  width: 2.7vw;
+  height: 2.7vw;
+  min-width: 28px;
+  min-height: 28px;
+}
+
+.game-stage .chef-sidebar {
+  position: absolute;
+  z-index: 6;
+  right: 2.2%;
+  top: 24%;
+  width: 20%;
+  display: grid;
+  gap: 0.8vw;
+}
+
+.game-stage .active-chef-card {
+  padding: 0;
+  gap: 0.3vw;
+  background: transparent;
+  box-shadow: none;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.44);
+}
+
+.game-stage .sticker-badge {
+  top: 1%;
+  right: 2%;
+  padding: 0.5vw 0.75vw;
+  font-size: clamp(0.52rem, 0.85vw, 0.78rem);
+}
+
+.game-stage .chef-portrait {
+  width: 100%;
+  height: 29vw;
+  max-height: 330px;
+  min-height: 180px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 24px rgba(121, 89, 73, 0.08);
+}
+
+.game-stage .active-chef-card strong {
+  font-size: clamp(1rem, 2vw, 1.85rem);
+}
+
+.game-stage .active-chef-card p {
+  font-size: clamp(0.75rem, 1.2vw, 1rem);
+}
+
+.game-stage .chef-order-tag,
+.game-stage .active-chef-card small {
+  display: none;
+}
+
+.game-stage .support-chef-card {
+  padding: 0.6vw;
+  border-radius: 22px;
+  background: rgba(255, 251, 247, 0.64);
+  backdrop-filter: blur(2px);
+}
+
+.game-stage .support-chef-card span {
+  width: 3.9vw;
+  height: 3.9vw;
+  min-width: 38px;
+  min-height: 38px;
+  flex-basis: auto;
+}
+
+.game-stage .support-chef-card strong,
+.game-stage .support-chef-card small {
+  font-size: clamp(0.58rem, 0.92vw, 0.85rem);
+}
+
+.game-stage .cat-button {
+  position: absolute;
+  z-index: 9;
+  left: 40%;
+  bottom: 0.5%;
+  width: 16%;
+  padding: 0;
+  border-radius: 28px;
+  color: #7b4a3d;
+  background: transparent;
+  box-shadow: none;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.48);
+}
+
+.game-stage .cat-art {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 0;
+  filter: drop-shadow(0 14px 12px rgba(121, 89, 73, 0.18));
+}
+
+.game-stage .cat-button.active {
+  background: rgba(255, 239, 244, 0.42);
+  outline: 3px solid rgba(202, 104, 128, 0.32);
+  box-shadow: 0 0 26px rgba(202, 104, 128, 0.24);
+}
+
+.game-stage .ingredient-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  width: auto;
+  aspect-ratio: auto;
+  margin: 0;
+  overflow: visible;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.game-stage .ingredient-stage-bg {
+  display: none;
+}
+
+.game-stage .table-ingredient {
+  pointer-events: auto;
+  border: 0;
+  border-radius: 22px;
+  background: transparent;
+  cursor: grab;
+}
+
+.game-stage .table-ingredient::before {
+  content: '';
+  position: absolute;
+  inset: -8%;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--ingredient-tint, #ffe39f) 22%, transparent), transparent 70%),
+    rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--ingredient-accent, #df7c69) 46%, transparent),
+    0 10px 18px rgba(120, 70, 50, 0.12);
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.game-stage .table-ingredient.highlighted::before {
+  opacity: 0.36;
+}
+
+.game-stage .table-ingredient:hover::before,
+.game-stage .table-ingredient:focus-visible::before,
+.game-stage .table-ingredient.selected::before {
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+.game-stage .table-ingredient:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ingredient-accent, #df7c69) 70%, white);
+  outline-offset: 4px;
+}
+
+.game-stage .table-ingredient.dragging {
+  opacity: 0.62;
+}
+
+@media (max-width: 760px) {
+  .play-shell {
+    padding: 8px;
+  }
+
+  .game-stage {
+    width: min(calc(100vw - 16px), calc(100vh - 16px));
+    border-radius: 22px;
+  }
+
+  .game-stage .brand h1 {
+    font-size: clamp(1.15rem, 5vw, 2rem);
+  }
+
+  .game-stage .speech-row {
+    top: 11.5%;
+    left: 18%;
+    width: 61%;
+  }
+
+  .game-stage .speech-bubble {
+    padding: 1.3vw;
+    border-width: 2px;
+  }
+
+  .game-stage .recipe-sidebar {
+    top: 25%;
+    width: 25%;
+  }
+
+  .game-stage .recipe-checklist li {
+    padding: 0.45vw;
+  }
+
+  .game-stage .prep-stage {
+    left: 25%;
+    top: 45.5%;
+    width: 55%;
+    height: 32%;
+  }
+
+  .game-stage .chef-sidebar {
+    right: 1.6%;
+    width: 20.5%;
+  }
+
+  .game-stage .chef-portrait {
+    min-height: 120px;
+  }
+}
+
+/* Clean stage v2: low-chrome play table with draggable sticker ingredients. */
+.game-stage {
+  background-image: url('/assets/backgrounds/kawaii-bakery-clean-stage.png');
+}
+
+.game-stage .recipe-shell {
+  position: absolute;
+  z-index: 12;
+  left: 3%;
+  top: 28%;
+  width: 8%;
+  height: 8%;
+}
+
+.game-stage .recipe-tab {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 24%;
+  display: grid;
+  place-items: center;
+  gap: 0.1vw;
+  cursor: pointer;
+  color: #75473a;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.9), rgba(255, 244, 236, 0.82) 62%),
+    #ffe6d7;
+  box-shadow:
+    0 16px 24px rgba(121, 89, 73, 0.16),
+    0 0 0 5px rgba(255, 255, 255, 0.32);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.game-stage .recipe-tab span {
+  font-size: clamp(1.2rem, 3.2vw, 2.25rem);
+  line-height: 1;
+}
+
+.game-stage .recipe-tab strong {
+  font-size: clamp(0.56rem, 0.95vw, 0.8rem);
+  line-height: 1;
+}
+
+.game-stage .recipe-tab:hover,
+.game-stage .recipe-tab:focus-visible,
+.game-stage .recipe-shell.open .recipe-tab {
+  transform: translateY(-3px) rotate(-3deg);
+  box-shadow:
+    0 20px 28px rgba(121, 89, 73, 0.18),
+    0 0 0 5px rgba(255, 255, 255, 0.42),
+    0 0 24px rgba(202, 104, 128, 0.22);
+}
+
+.game-stage .recipe-drawer {
+  position: absolute;
+  left: 0;
+  top: 112%;
+  width: 300%;
+  max-height: 425%;
+  padding: 1.05vw;
+  border-radius: 28px 30px 34px 26px;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 246, 0.95), rgba(255, 241, 232, 0.93)),
+    repeating-linear-gradient(0deg, rgba(255, 212, 201, 0.14) 0 18px, transparent 18px 36px);
+  box-shadow:
+    0 22px 34px rgba(121, 89, 73, 0.16),
+    inset 0 0 0 2px rgba(255, 227, 214, 0.9);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-8px) rotate(-1deg);
+  transition: opacity 150ms ease, transform 150ms ease, visibility 150ms ease;
+}
+
+.game-stage .recipe-shell.open .recipe-drawer,
+.game-stage .recipe-shell:hover .recipe-drawer,
+.game-stage .recipe-shell:focus-within .recipe-drawer {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) rotate(-1deg);
+}
+
+.game-stage .recipe-drawer .order-hero {
+  margin-bottom: 0.8vw;
+}
+
+.game-stage .recipe-drawer .order-thumb {
+  width: clamp(38px, 4.4vw, 58px);
+  height: clamp(38px, 4.4vw, 58px);
+  min-width: 0;
+  min-height: 0;
+}
+
+.game-stage .recipe-drawer .recipe-checklist {
+  gap: 0.55vw;
+}
+
+.game-stage .recipe-drawer .recipe-checklist li {
+  padding: 0.5vw;
+  border-radius: 18px;
+}
+
+.game-stage .recipe-drawer .ingredient-badge {
+  width: clamp(30px, 2.8vw, 42px);
+  height: clamp(30px, 2.8vw, 42px);
+  min-width: 0;
+  min-height: 0;
+}
+
+.game-stage .recipe-drawer strong,
+.game-stage .recipe-drawer small {
+  font-size: clamp(0.56rem, 0.9vw, 0.82rem);
+}
+
+.game-stage .prep-stage {
+  left: 22%;
+  top: 61%;
+  width: 56%;
+  height: 22%;
+  z-index: 7;
+}
+
+.game-stage .prep-dropzone {
+  padding: 1vw;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.5), rgba(255, 244, 236, 0.05) 66%),
+    rgba(255, 245, 238, 0.14);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.32),
+    0 16px 30px rgba(121, 89, 73, 0.06);
+}
+
+.game-stage .prep-copy {
+  position: absolute;
+  left: 50%;
+  top: 4%;
+  transform: translateX(-50%);
+  z-index: 2;
+  min-width: 42%;
+  padding: 0.45vw 0.8vw;
+  border-radius: 999px;
+  background: rgba(255, 250, 246, 0.68);
+  box-shadow: 0 8px 14px rgba(121, 89, 73, 0.08);
+}
+
+.game-stage .prep-copy strong {
+  margin: 0;
+  font-size: clamp(0.68rem, 1.15vw, 1rem);
+}
+
+.game-stage .live-dish {
+  height: 100%;
+}
+
+.game-stage .image-dish {
+  width: min(66%, 250px);
+}
+
+.game-stage .finish-action {
+  bottom: 4%;
+  min-width: 28%;
+  padding: 0.55vw 0.9vw;
+  font-size: clamp(0.62rem, 0.95vw, 0.88rem);
+}
+
+.game-stage:not(.is-editing-layout) .finish-action.not-ready {
+  pointer-events: none;
+}
+
+.game-stage .finish-action img {
+  width: 2.25vw;
+  height: 2.25vw;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.game-stage .character-stickers {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.game-stage .character-sticker {
+  position: absolute;
+  display: grid;
+  place-items: end center;
+  transition: opacity 170ms ease, filter 170ms ease, transform 170ms ease;
+}
+
+.game-stage .character-sticker img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 18px 14px rgba(121, 89, 73, 0.14));
+}
+
+.game-stage .character-sticker.active {
+  opacity: 1;
+  transform: translateY(-3px);
+}
+
+.game-stage .character-sticker.active img {
+  filter:
+    drop-shadow(0 18px 14px rgba(121, 89, 73, 0.16))
+    drop-shadow(0 0 18px color-mix(in srgb, var(--chef-accent, #df7c69) 42%, transparent));
+}
+
+.game-stage .character-sticker.inactive {
+  opacity: 0.46;
+  transform: scale(0.97);
+}
+
+.game-stage .yuto-character {
+  left: 18%;
+  top: 24%;
+  width: 18%;
+  height: 34%;
+}
+
+.game-stage .akari-character {
+  left: 70%;
+  top: 24%;
+  width: 19%;
+  height: 35%;
+}
+
+.game-stage .cat-button {
+  left: 39%;
+  top: 82%;
+  bottom: auto;
+  width: 22%;
+  height: 17%;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+}
+
+.game-stage .cat-art {
+  width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.game-stage .cat-button.active {
+  background: transparent;
+  outline: 0;
+  box-shadow: none;
+  animation: mochiClickPrompt 760ms ease-in-out infinite;
+}
+
+.game-stage .game-toast {
+  position: absolute;
+  z-index: 13;
+  left: 50%;
+  top: 56%;
+  transform: translateX(-50%);
+  padding: 0.7vw 1.05vw;
+  border-radius: 999px;
+  color: #714538;
+  font-weight: 900;
+  font-size: clamp(0.68rem, 1.05vw, 0.95rem);
+  background: rgba(255, 250, 246, 0.88);
+  box-shadow:
+    0 14px 24px rgba(121, 89, 73, 0.14),
+    0 0 0 4px rgba(255, 255, 255, 0.28);
+  animation: toastPop 1300ms ease forwards;
+}
+
+.game-stage .game-toast.good {
+  color: #507147;
+}
+
+.game-stage .game-toast.wrong {
+  color: #b95467;
+}
+
+.game-stage .game-toast.cat {
+  color: #bd6b7a;
+}
+
+.game-stage .ingredient-stage {
+  z-index: 8;
+}
+
+.game-stage .table-ingredient {
+  border-radius: 26px;
+  display: grid;
+  place-items: center;
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.game-stage .table-ingredient::before {
+  inset: -9%;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.08) 62%, transparent 72%),
+    color-mix(in srgb, var(--ingredient-tint, #ffe39f) 24%, transparent);
+}
+
+.game-stage .table-ingredient img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 10px rgba(120, 70, 50, 0.13));
+  transition: transform 150ms ease, filter 150ms ease;
+}
+
+.game-stage .table-ingredient.highlighted::before {
+  opacity: 0.82;
+  animation: neededPulse 1050ms ease-in-out infinite alternate;
+}
+
+.game-stage .table-ingredient.highlighted img {
+  animation: ingredientBob 1050ms ease-in-out infinite alternate;
+}
+
+.game-stage .table-ingredient:hover img,
+.game-stage .table-ingredient:focus-visible img,
+.game-stage .table-ingredient.selected img {
+  transform: translateY(-5px) scale(1.05);
+  filter: drop-shadow(0 14px 16px rgba(120, 70, 50, 0.2));
+}
+
+.game-stage .table-ingredient.shake img {
+  animation: ingredientShake 320ms ease;
+}
+
+.game-stage.is-editing-layout .layout-edit-target {
+  outline: 1.5px dashed rgba(105, 155, 176, 0.66);
+  outline-offset: 0;
+  cursor: move;
+}
+
+.game-stage.is-editing-layout .character-sticker {
+  pointer-events: auto;
+}
+
+.game-stage.is-editing-layout .prep-layer,
+.game-stage.is-editing-layout .prep-hint-layer,
+.game-stage.is-editing-layout .finish-action,
+.game-stage.is-editing-layout .mochi-layer {
+  pointer-events: auto;
+}
+
+.game-stage.is-editing-layout .layout-edit-target::after {
+  content: attr(data-layout-label);
+  position: absolute;
+  left: 50%;
+  top: -1.1rem;
+  z-index: 100;
+  padding: 0.16rem 0.36rem;
+  border-radius: 999px;
+  color: #17485a;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 6px 12px rgba(88, 68, 56, 0.1);
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-50%) translateY(2px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.game-stage.is-editing-layout .layout-edit-target:hover::after,
+.game-stage.is-editing-layout .layout-edit-target:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.game-stage.is-editing-layout .table-ingredient {
+  cursor: move;
+  outline-offset: -1px;
+}
+
+.game-stage.is-editing-layout .prep-layer,
+.game-stage.is-editing-layout .prep-hit-area,
+.game-stage.is-editing-layout .prep-hint-layer,
+.game-stage.is-editing-layout .finish-action,
+.game-stage.is-editing-layout .mochi-layer,
+.game-stage.is-editing-layout .cat-button,
+.game-stage.is-editing-layout .table-ingredient {
+  cursor: move;
+}
+
+.layout-resize-handle {
+  position: absolute;
+  right: -0.28rem;
+  bottom: -0.28rem;
+  z-index: 120;
+  width: 0.68rem;
+  height: 0.68rem;
+  border-radius: 999px;
+  background: #5e9fb6;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.82),
+    0 8px 12px rgba(88, 68, 56, 0.16);
+  cursor: nwse-resize;
+  pointer-events: auto;
+}
+
+.game-stage .character-sticker .layout-resize-handle {
+  top: -0.28rem;
+  right: -0.28rem;
+  bottom: auto;
+}
+
+@keyframes neededPulse {
+  from {
+    transform: scale(0.96);
+    opacity: 0.54;
+  }
+  to {
+    transform: scale(1.06);
+    opacity: 0.9;
+  }
+}
+
+@keyframes ingredientBob {
+  from {
+    transform: translateY(0) scale(var(--image-scale, 1));
+  }
+  to {
+    transform: translateY(-4px) scale(var(--image-scale, 1));
+  }
+}
+
+@keyframes ingredientShake {
+  0%, 100% {
+    transform: translateX(0) scale(var(--image-scale, 1));
+  }
+  25% {
+    transform: translateX(-5px) rotate(-2deg) scale(var(--image-scale, 1));
+  }
+  75% {
+    transform: translateX(5px) rotate(2deg) scale(var(--image-scale, 1));
+  }
+}
+
+@keyframes toastPop {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px) scale(0.94);
+  }
+  12%, 82% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px) scale(0.98);
+  }
+}
+
+@keyframes mochiHeartBurst {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px) scale(0.7);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-34px) scale(1.32);
+  }
+}
+
+@keyframes mochiClickPrompt {
+  0%, 100% {
+    filter: drop-shadow(0 12px 10px rgba(174, 121, 110, 0.16));
+  }
+  35% {
+    filter: drop-shadow(0 18px 20px rgba(174, 121, 110, 0.34));
+  }
+  70% {
+    filter: drop-shadow(0 14px 16px rgba(174, 121, 110, 0.26));
+  }
+}
+
+@keyframes mochiArtPrompt {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(var(--image-scale, 1));
+  }
+  28% {
+    transform: translateY(-4px) rotate(-2deg) scale(calc(var(--image-scale, 1) * 1.04));
+  }
+  56% {
+    transform: translateY(1px) rotate(1.5deg) scale(calc(var(--image-scale, 1) * 1.01));
+  }
+  78% {
+    transform: translateY(-2px) rotate(-0.5deg) scale(calc(var(--image-scale, 1) * 1.025));
+  }
+}
+
+@keyframes thoughtBubblePop {
+  from {
+    opacity: 0.9;
+    transform: translateY(0) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-4px) scale(1);
+  }
+}
+
+@keyframes prepActionGlow {
+  from {
+    filter: brightness(1);
+    box-shadow:
+      0 12px 20px rgba(121, 89, 73, 0.14),
+      0 0 0 4px rgba(255, 255, 255, 0.24),
+      0 0 18px rgba(215, 158, 103, 0.18);
+  }
+  to {
+    filter: brightness(1.04);
+    box-shadow:
+      0 14px 22px rgba(121, 89, 73, 0.16),
+      0 0 0 4px rgba(255, 255, 255, 0.3),
+      0 0 30px rgba(215, 158, 103, 0.34);
+  }
+}
+
+@keyframes recipeTimerEmpty {
+  from {
+    filter: drop-shadow(0 0 5px rgba(224, 132, 151, 0.08));
+    opacity: 0.72;
+  }
+  to {
+    filter: drop-shadow(0 0 10px rgba(224, 132, 151, 0.18));
+    opacity: 1;
+  }
+}
+
+@media (max-width: 760px) {
+  .game-stage .recipe-shell {
+    left: 2.5%;
+    top: 27%;
+    width: 9.5%;
+    height: 9.5%;
+  }
+
+  .game-stage .recipe-drawer {
+    width: 340%;
+    padding: 1.2vw;
+  }
+
+  .game-stage .prep-stage {
+    left: 22%;
+    top: 61%;
+    width: 56%;
+    height: 22%;
+  }
+
+  .game-stage .yuto-character {
+    left: 17%;
+    top: 25%;
+    width: 19%;
+    height: 32%;
+  }
+
+  .game-stage .akari-character {
+    left: 70%;
+    top: 25%;
+    width: 20%;
+    height: 33%;
+  }
+
+  .game-stage .cat-button {
+    left: 38%;
+    top: 82%;
+    width: 24%;
+  }
+}
+
+/* Paper-theater refactor: the game is staged as scenery, not dashboard panels. */
+.play-shell {
+  min-height: 100vh;
+  padding: 12px;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255, 231, 199, 0.7), transparent 24%),
+    radial-gradient(circle at 86% 14%, rgba(255, 216, 223, 0.52), transparent 22%),
+    linear-gradient(180deg, #fff4e9, #f5dec7 72%, #eecfb6);
+}
+
+.game-stage {
+  position: relative;
+  width: min(calc(100vw - 24px), calc(100vh - 24px), 1160px);
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 30px;
+  background: #f8dcc2;
+  box-shadow:
+    0 34px 72px rgba(112, 73, 48, 0.23),
+    0 0 0 8px rgba(255, 255, 255, 0.34);
+  isolation: isolate;
+}
+
+.stage-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+}
+
+.room-layer {
+  z-index: 0;
+}
+
+.characters-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.table-layer {
+  z-index: 20;
+}
+
+.ingredients-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.prep-layer {
+  position: absolute;
+  z-index: 35;
+  left: 32%;
+  top: 55%;
+  width: 36%;
+  height: 24%;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transform: rotate(var(--rotation, 0deg));
+}
+
+.prep-hit-area,
+.prep-hint-layer,
+.finish-action {
+  position: absolute;
+  transform: rotate(var(--rotation, 0deg));
+}
+
+.prep-hit-area {
+  z-index: 42;
+  border-radius: 26px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.prep-hint-layer {
+  z-index: 43;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.mochi-layer {
+  position: absolute;
+  z-index: 45;
+  left: 42%;
+  top: 82%;
+  width: 16%;
+  aspect-ratio: 1.25;
+  pointer-events: none;
+  transform: rotate(var(--rotation, 0deg));
+}
+
+.ui-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.game-stage .character-sticker {
+  position: absolute;
+  display: grid;
+  place-items: end center;
+  pointer-events: none;
+  transform: rotate(var(--rotation, 0deg));
+  transform-origin: center bottom;
+  transition: opacity 170ms ease, filter 170ms ease, transform 170ms ease;
+}
+
+.game-stage .character-sticker img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 22px 16px rgba(121, 89, 73, 0.16));
+  transform: scale(var(--image-scale, 1));
+  transform-origin: center bottom;
+}
+
+.game-stage .character-sticker.active {
+  opacity: 1;
+  transform: translateY(-4px) rotate(var(--rotation, 0deg));
+}
+
+.game-stage .character-sticker.active img {
+  filter:
+    drop-shadow(0 24px 18px rgba(121, 89, 73, 0.18))
+    drop-shadow(0 0 18px color-mix(in srgb, var(--chef-accent, #df7c69) 40%, transparent));
+}
+
+.game-stage .character-sticker.inactive {
+  opacity: 0.82;
+  transform: scale(0.985) rotate(var(--rotation, 0deg));
+}
+
+.game-stage .yuto-character {
+  left: 23%;
+  top: 17%;
+  width: 25%;
+  height: 54%;
+}
+
+.game-stage .akari-character {
+  left: 53%;
+  top: 17%;
+  width: 28%;
+  height: 55%;
+}
+
+.game-stage .prep-dropzone {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  pointer-events: auto;
+  background: transparent;
+  border: 0;
+  border-radius: 34px;
+  outline: 0;
+  box-shadow: none;
+}
+
+.game-stage .prep-art {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.game-stage .prep-hit-area::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 52%, rgba(255, 255, 255, 0.22), transparent 68%);
+  box-shadow: inset 0 0 30px rgba(121, 179, 148, 0.1);
+  opacity: 0;
+  transition: opacity 150ms ease, box-shadow 150ms ease;
+}
+
+.game-stage .prep-hit-area.waiting::before {
+  opacity: 0.42;
+}
+
+.game-stage .prep-hit-area.complete::before {
+  opacity: 0.34;
+  box-shadow: inset 0 0 30px rgba(223, 124, 105, 0.11);
+}
+
+.game-stage .prep-hit-area:hover::before,
+.game-stage .prep-hit-area:focus-visible::before {
+  opacity: 0.7;
+}
+
+.game-stage .prep-dropzone::before {
+  content: '';
+  position: absolute;
+  inset: 8% 4% 14%;
+  border-radius: 34px;
+  background: radial-gradient(circle at 50% 52%, rgba(255, 255, 255, 0.2), transparent 62%);
+  opacity: 0;
+  transition: opacity 150ms ease, box-shadow 150ms ease;
+}
+
+.game-stage .prep-dropzone.waiting::before {
+  opacity: 0.4;
+  box-shadow: inset 0 0 36px rgba(121, 179, 148, 0.12);
+}
+
+.game-stage .prep-dropzone.complete::before {
+  opacity: 0.35;
+  box-shadow: inset 0 0 36px rgba(223, 124, 105, 0.12);
+}
+
+.game-stage .prep-dropzone.waiting,
+.game-stage .prep-dropzone.complete {
+  outline: 0;
+}
+
+.game-stage .prep-dropzone:hover::before,
+.game-stage .prep-dropzone:focus-within::before {
+  opacity: 0.72;
+}
+
+.game-stage .sparkle {
+  display: none;
+}
+
+.game-stage .prep-copy {
+  position: absolute;
+  left: 50%;
+  top: -7%;
+  z-index: 2;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.42vw 0.75vw;
+  transform: translateX(-50%) rotate(-1deg);
+  border-radius: 999px;
+  color: #75473a;
+  background: rgba(255, 246, 235, 0.74);
+  box-shadow: 0 8px 14px rgba(121, 89, 73, 0.08);
+  pointer-events: none;
+}
+
+.game-stage .prep-hint-layer .prep-copy {
+  position: static;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  padding: 0 0.75vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transform: none;
+  pointer-events: none;
+}
+
+.game-stage .prep-hint-layer:has(.prep-action-button) {
+  pointer-events: auto;
+}
+
+.game-stage .prep-hint-layer:has(.prep-action-button) .prep-copy {
+  padding: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 251, 236, 0.96), rgba(255, 226, 205, 0.94));
+  box-shadow:
+    0 12px 20px rgba(121, 89, 73, 0.14),
+    0 0 0 4px rgba(255, 255, 255, 0.24),
+    0 0 24px rgba(215, 158, 103, 0.25);
+  pointer-events: auto;
+  animation: prepActionGlow 1500ms ease-in-out infinite alternate;
+}
+
+.game-stage .prep-action-button {
+  width: 100%;
+  height: 100%;
+  padding: 0 0.5vw;
+  border: 0;
+  border-radius: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.32vw;
+  color: #714538;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.game-stage .prep-action-button strong {
+  color: #6e5f34;
+}
+
+.game-stage .prep-action-button:hover,
+.game-stage .prep-action-button:focus-visible {
+  outline: 0;
+  filter: brightness(1.03);
+}
+
+.game-stage .prep-action-button img {
+  width: clamp(18px, 1.85vw, 28px);
+  height: clamp(18px, 1.85vw, 28px);
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.game-stage .prep-copy strong {
+  margin: 0;
+  color: #75473a;
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+  font-size: clamp(0.48rem, 0.74vw, 0.74rem);
+  line-height: 1.06;
+  white-space: normal;
+}
+
+.game-stage .prep-copy.good {
+  background: rgba(244, 255, 235, 0.86);
+  box-shadow:
+    0 8px 14px rgba(93, 125, 71, 0.1),
+    inset 0 0 0 1px rgba(135, 168, 103, 0.2);
+}
+
+.game-stage .prep-copy.hint {
+  background: rgba(255, 248, 230, 0.86);
+}
+
+.game-stage .prep-copy.wrong {
+  background: rgba(255, 239, 235, 0.9);
+  box-shadow:
+    0 8px 14px rgba(164, 93, 92, 0.11),
+    inset 0 0 0 1px rgba(164, 93, 92, 0.18);
+}
+
+.game-stage .prep-copy.cat {
+  background: rgba(255, 247, 241, 0.92);
+  box-shadow:
+    0 8px 14px rgba(121, 89, 73, 0.1),
+    inset 0 0 0 1px rgba(184, 128, 120, 0.16);
+}
+
+.game-stage .prep-copy.good strong {
+  color: #567344;
+}
+
+.game-stage .prep-copy.hint strong {
+  color: #8a6844;
+}
+
+.game-stage .prep-copy.wrong strong {
+  color: #a45d5c;
+}
+
+.game-stage .prep-copy.cat strong {
+  color: #765750;
+}
+
+.game-stage .live-dish {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.game-stage .image-dish {
+  width: min(64%, 270px);
+  aspect-ratio: 1;
+  min-height: 0;
+}
+
+.game-stage .latte-image-dish,
+.game-stage .soda-image-dish {
+  width: min(48%, 210px);
+}
+
+.game-stage .dish-layer {
+  filter: drop-shadow(0 18px 14px rgba(105, 73, 56, 0.13));
+}
+
+.game-stage .finish-action {
+  position: absolute;
+  z-index: 44;
+  bottom: auto;
+  min-width: 0;
+  padding: 0.55vw 0.9vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45vw;
+  transform: rotate(var(--rotation, 0deg));
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #6e4437;
+  background:
+    linear-gradient(180deg, rgba(255, 241, 229, 0.92), rgba(255, 218, 205, 0.9));
+  box-shadow:
+    0 12px 18px rgba(121, 89, 73, 0.13),
+    0 0 0 4px rgba(255, 255, 255, 0.23);
+  pointer-events: auto;
+}
+
+.game-stage:not(.is-editing-layout) .finish-action {
+  display: none;
+  pointer-events: none;
+}
+
+.game-stage .finish-action:hover {
+  transform: translateY(-2px) rotate(var(--rotation, 0deg));
+}
+
+.game-stage .finish-action img {
+  width: clamp(20px, 2vw, 30px);
+  height: clamp(20px, 2vw, 30px);
+  object-fit: contain;
+}
+
+.game-stage .finish-action strong {
+  color: #6e4437;
+  font-size: clamp(0.58rem, 0.9vw, 0.82rem);
+  white-space: nowrap;
+}
+
+.game-stage .table-ingredient {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  pointer-events: auto;
+  transform: rotate(var(--rotation, 0deg));
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.game-stage .table-ingredient::before {
+  content: '';
+  position: absolute;
+  inset: 2%;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.56), rgba(255, 255, 255, 0.06) 62%, transparent 74%),
+    color-mix(in srgb, var(--ingredient-tint, #ffe39f) 18%, transparent);
+  box-shadow: 0 10px 18px rgba(120, 70, 50, 0.1);
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.game-stage .table-ingredient img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 10px rgba(120, 70, 50, 0.13));
+  transform: scale(var(--image-scale, 1));
+  transition: transform 150ms ease, filter 150ms ease;
+}
+
+.game-stage .table-ingredient.highlighted::before {
+  opacity: 0.78;
+  animation: neededPulse 1050ms ease-in-out infinite alternate;
+}
+
+.game-stage .table-ingredient.highlighted img {
+  animation: ingredientBob 1050ms ease-in-out infinite alternate;
+}
+
+.game-stage .table-ingredient:hover::before,
+.game-stage .table-ingredient:focus-visible::before,
+.game-stage .table-ingredient.selected::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.game-stage .table-ingredient:hover img,
+.game-stage .table-ingredient:focus-visible img,
+.game-stage .table-ingredient.selected img {
+  transform: translateY(-5px) scale(calc(var(--image-scale, 1) * 1.05));
+  filter: drop-shadow(0 14px 16px rgba(120, 70, 50, 0.2));
+}
+
+.game-stage .table-ingredient:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ingredient-accent, #df7c69) 70%, white);
+  outline-offset: 1px;
+}
+
+.game-stage .table-ingredient:active {
+  cursor: grabbing;
+}
+
+.game-stage .table-ingredient.dragging {
+  opacity: 0.62;
+}
+
+.game-stage .table-ingredient.shake img {
+  animation: ingredientShake 320ms ease;
+}
+
+.game-stage .cat-button {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 0;
+  color: #7b4a3d;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.game-stage .cat-art {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 0;
+  filter: drop-shadow(0 15px 12px rgba(121, 89, 73, 0.18));
+  transform: scale(var(--image-scale, 1));
+  transform-origin: center bottom;
+  pointer-events: none;
+}
+
+.game-stage .cat-button.active {
+  background: transparent;
+  outline: 0;
+  box-shadow: none;
+  animation: none;
+}
+
+.game-stage .mochi-layer.needs-pet .cat-art {
+  animation: mochiArtPrompt 1350ms ease-in-out infinite;
+}
+
+.game-stage .cat-bubble {
+  position: absolute;
+  right: -10%;
+  top: -2%;
+  padding: 0.42vw 0.55vw;
+  border-radius: 999px;
+  color: #8b5e62;
+  font-weight: 900;
+  font-size: clamp(0.58rem, 0.9vw, 0.82rem);
+  background: rgba(255, 247, 241, 0.94);
+  box-shadow: 0 8px 14px rgba(121, 89, 73, 0.12);
+}
+
+.game-stage .mochi-heart-burst {
+  position: absolute;
+  left: 50%;
+  top: -8%;
+  z-index: 3;
+  color: #e46585;
+  font-size: clamp(1.1rem, 2.3vw, 2.3rem);
+  font-weight: 950;
+  transform: translateX(-50%);
+  text-shadow: 0 4px 10px rgba(121, 89, 73, 0.18);
+  pointer-events: none;
+  animation: mochiHeartBurst 1100ms ease-out forwards;
+}
+
+.game-stage .akari-thought-bubble {
+  position: absolute;
+  z-index: 52;
+  left: 64.2%;
+  top: 17.6%;
+  width: 18.6%;
+  box-sizing: border-box;
+  padding: 0.82vw 1vw;
+  border-radius: 24px 24px 26px 18px;
+  color: #765750;
+  background:
+    radial-gradient(circle at 24% 22%, rgba(255, 255, 255, 0.95), transparent 22%),
+    linear-gradient(180deg, rgba(255, 251, 246, 0.96), rgba(255, 239, 228, 0.94));
+  box-shadow:
+    0 12px 20px rgba(121, 89, 73, 0.13),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+  font-size: clamp(0.56rem, 0.82vw, 0.78rem);
+  font-weight: 950;
+  line-height: 1.08;
+  text-align: center;
+  pointer-events: none;
+  animation: thoughtBubblePop 1250ms ease-in-out infinite alternate;
+}
+
+.game-stage .akari-thought-bubble strong,
+.game-stage .akari-thought-bubble span {
+  display: block;
+}
+
+.game-stage .akari-thought-bubble strong {
+  color: #75534c;
+}
+
+.game-stage .akari-thought-bubble span {
+  margin-top: 0.18vw;
+  font-weight: 850;
+  opacity: 0.9;
+}
+
+.game-stage .akari-thought-bubble.cat span {
+  color: #60855e;
+}
+
+.game-stage .akari-thought-bubble.action span {
+  color: #a9712f;
+}
+
+.game-stage .akari-thought-bubble.action {
+  background:
+    radial-gradient(circle at 24% 22%, rgba(255, 255, 255, 0.95), transparent 22%),
+    linear-gradient(180deg, rgba(255, 253, 244, 0.96), rgba(255, 242, 226, 0.94));
+}
+
+.game-stage .akari-thought-bubble::after {
+  content: "";
+  position: absolute;
+  left: 15%;
+  bottom: -0.46vw;
+  width: 0.78vw;
+  height: 0.78vw;
+  border-radius: 50%;
+  background: rgba(255, 240, 231, 0.94);
+  box-shadow:
+    -0.72vw 0.58vw 0 -0.18vw rgba(255, 240, 231, 0.86),
+    -1.2vw 1vw 0 -0.32vw rgba(255, 240, 231, 0.74);
+}
+
+.game-stage .stage-title {
+  position: absolute;
+  left: 5%;
+  top: 3.4%;
+  padding: 0.42vw 1.05vw 0.56vw;
+  border-radius: 24px 28px 26px 22px;
+  color: #7c5145;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3vw, 2.9rem);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 245, 0.96), rgba(255, 235, 221, 0.92));
+  box-shadow:
+    0 14px 24px rgba(121, 89, 73, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.74);
+  text-shadow:
+    0 3px 0 rgba(255, 255, 255, 0.72),
+    0 10px 16px rgba(122, 77, 59, 0.16);
+}
+
+.game-stage .mini-score-strip {
+  position: absolute;
+  top: 3.6%;
+  right: 4.2%;
+  display: flex;
+  gap: 0.55vw;
+  pointer-events: none;
+}
+
+.game-stage .mini-score-strip span {
+  padding: 0.45vw 0.7vw;
+  border-radius: 999px;
+  color: #7c5145;
+  font-weight: 900;
+  font-size: clamp(0.56rem, 0.86vw, 0.78rem);
+  background: rgba(255, 249, 240, 0.64);
+  box-shadow: 0 8px 14px rgba(121, 89, 73, 0.08);
+}
+
+.game-stage .recipe-note {
+  position: absolute;
+  left: 5%;
+  top: 22%;
+  width: 20%;
+  max-height: 34%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  overflow: hidden;
+  padding: 0.72vw 0.72vw 0.68vw;
+  border-radius: 20px 22px 24px 19px;
+  color: #70463a;
+  background:
+    linear-gradient(180deg, #fffaf0, #ffefdf),
+    repeating-linear-gradient(0deg, rgba(218, 151, 133, 0.16) 0 16px, transparent 16px 32px);
+  box-shadow:
+    0 14px 20px rgba(121, 89, 73, 0.13),
+    inset 0 0 0 1px rgba(255, 228, 205, 0.76);
+  transform: rotate(var(--rotation, -1.4deg));
+  pointer-events: auto;
+}
+
+.game-stage .recipe-note > *:not(.recipe-timer-border) {
+  position: relative;
+  z-index: 1;
+}
+
+.game-stage .recipe-timer-border {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: 4px;
+  border-radius: inherit;
+  background:
+    conic-gradient(
+      from -90deg,
+      rgba(224, 132, 151, 0.48) calc(var(--mochi-progress, 1) * 1turn),
+      rgba(252, 224, 232, 0.18) 0
+    );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  filter: drop-shadow(0 0 6px rgba(224, 132, 151, 0.1));
+  pointer-events: none;
+  transition: background 140ms linear;
+}
+
+.game-stage .recipe-timer-border.empty {
+  animation: recipeTimerEmpty 760ms ease-in-out infinite alternate;
+}
+
+.game-stage .recipe-note .layout-resize-handle {
+  right: -0.35rem;
+  bottom: -0.35rem;
+}
+
+.game-stage .recipe-pin {
+  position: absolute;
+  left: 50%;
+  top: -0.55vw;
+  width: 2.5vw;
+  height: 1vw;
+  border-radius: 8px;
+  transform: translateX(-50%) rotate(4deg);
+  background: rgba(255, 209, 140, 0.7);
+  box-shadow: 0 4px 8px rgba(121, 89, 73, 0.08);
+}
+
+.game-stage .recipe-note .order-hero {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0.44vw;
+  margin: 0 0 0.44vw;
+}
+
+.game-stage .recipe-note .order-thumb {
+  width: clamp(28px, 3.1vw, 46px);
+  height: clamp(28px, 3.1vw, 46px);
+  min-width: 0;
+  min-height: 0;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  object-fit: contain;
+  background: #fffdfa;
+}
+
+.game-stage .mochi-recipe-alert {
+  margin: 0 0 0.62vw;
+  padding: 0.5vw 0.58vw;
+  border-radius: 15px;
+  color: #8b4b59;
+  background: #fff1f5;
+  box-shadow: inset 0 0 0 1px rgba(222, 143, 159, 0.22);
+  font-size: clamp(0.54rem, 0.78vw, 0.72rem);
+  font-weight: 850;
+  line-height: 1.18;
+}
+
+.game-stage .recipe-note .order-hero strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: #70463a;
+  font-size: clamp(0.6rem, 0.94vw, 0.9rem);
+  line-height: 1.05;
+}
+
+.game-stage .recipe-note .order-hero small {
+  display: block;
+  margin-top: 0.2vw;
+  color: #9a6a59;
+  font-size: clamp(0.48rem, 0.68vw, 0.66rem);
+  line-height: 1.1;
+}
+
+.game-stage .recipe-note .recipe-checklist {
+  display: grid;
+  gap: 0.36vw;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 0 0 0.74vw;
+  margin: 0;
+  list-style: none;
+}
+
+.game-stage .recipe-note .recipe-checklist::-webkit-scrollbar {
+  width: 5px;
+}
+
+.game-stage .recipe-note .recipe-checklist::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(204, 143, 118, 0.34);
+}
+
+.game-stage .recipe-note .recipe-checklist li {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0.36vw;
+  padding: 0.26vw 0.32vw;
+  border-radius: 12px;
+  box-sizing: border-box;
+  background: #fff7ed;
+}
+
+.game-stage .recipe-note .recipe-checklist li > div {
+  min-width: 0;
+}
+
+.game-stage .recipe-note .recipe-checklist li.current {
+  background: #f3ffe9;
+}
+
+.game-stage .recipe-note .recipe-checklist li.done {
+  opacity: 0.72;
+}
+
+.game-stage .recipe-note .recipe-checklist li.done strong {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.game-stage .recipe-note.compact-steps .recipe-checklist {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.32vw;
+  overflow: hidden;
+  padding-left: 0;
+}
+
+.game-stage .recipe-note.compact-steps .recipe-checklist li {
+  justify-content: center;
+  padding: 0.2vw;
+  aspect-ratio: 1;
+}
+
+.game-stage .recipe-note.compact-steps .recipe-checklist li > div {
+  display: none;
+}
+
+.game-stage .recipe-note.compact-steps .ingredient-badge {
+  width: clamp(24px, 2.35vw, 38px);
+  height: clamp(24px, 2.35vw, 38px);
+}
+
+.game-stage .recipe-note .ingredient-badge {
+  width: clamp(21px, 2vw, 32px);
+  height: clamp(21px, 2vw, 32px);
+  min-width: 0;
+  min-height: 0;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.game-stage .recipe-note .ingredient-badge img {
+  width: 148%;
+  height: 148%;
+  object-fit: contain;
+}
+
+.game-stage .recipe-note .recipe-checklist strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #70463a;
+  font-size: clamp(0.5rem, 0.72vw, 0.68rem);
+  line-height: 1.05;
+}
+
+.game-stage .recipe-note .recipe-checklist small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 0.14vw;
+  color: #9a6a59;
+  font-size: clamp(0.44rem, 0.6vw, 0.58rem);
+  line-height: 1;
+}
+
+.game-stage .game-toast {
+  position: absolute;
+  z-index: 60;
+  left: 50%;
+  top: 52%;
+  transform: translateX(-50%);
+  padding: 0.62vw 0.95vw;
+  border-radius: 999px;
+  color: #714538;
+  font-weight: 900;
+  font-size: clamp(0.62rem, 0.95vw, 0.88rem);
+  background: rgba(255, 249, 240, 0.88);
+  box-shadow:
+    0 12px 18px rgba(121, 89, 73, 0.13),
+    0 0 0 4px rgba(255, 255, 255, 0.22);
+  animation: toastPop 1300ms ease forwards;
+  pointer-events: none;
+}
+
+.game-stage .game-toast.good {
+  color: #507147;
+}
+
+.game-stage .game-toast.wrong {
+  color: #b95467;
+}
+
+.game-stage .game-toast.cat {
+  color: #bd6b7a;
+}
+
+.layout-editor {
+  position: absolute;
+  right: 3.5%;
+  bottom: 3.4%;
+  display: flex;
+  gap: 0.42vw;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.layout-editor button {
+  border: 0;
+  padding: 0.45vw 0.7vw;
+  border-radius: 999px;
+  color: #70463a;
+  font-weight: 900;
+  font-size: clamp(0.52rem, 0.82vw, 0.74rem);
+  background: rgba(255, 247, 237, 0.76);
+  box-shadow:
+    0 9px 16px rgba(121, 89, 73, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.54);
+  cursor: pointer;
+}
+
+.layout-editor.open button:first-child {
+  color: #17485a;
+  background: rgba(224, 245, 250, 0.88);
+}
+
+.layout-editor .credits-toggle {
+  animation: creditsButtonWiggle 75s ease-in-out infinite;
+}
+
+.credits-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  padding: 4%;
+  background: rgba(59, 41, 34, 0.58);
+  backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+
+.credits-panel {
+  position: relative;
+  width: min(48%, 520px);
+  padding: 2vw 2.2vw 1.8vw;
+  border-radius: 28px 30px 26px 32px;
+  color: #664236;
+  text-align: center;
+  background:
+    radial-gradient(circle at 24% 16%, rgba(255, 255, 255, 0.86), transparent 28%),
+    linear-gradient(180deg, rgba(255, 251, 245, 0.98), rgba(255, 236, 225, 0.96));
+  box-shadow:
+    0 28px 54px rgba(34, 22, 18, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+}
+
+.credits-title {
+  display: inline-block;
+  max-width: 100%;
+  color: #7b4a3d;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.4vw, 2.25rem);
+  font-weight: 950;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.credits-title:hover,
+.credits-panel a:hover {
+  text-decoration: underline;
+}
+
+.credits-panel p {
+  margin: 1vw 0 0;
+  color: #79564d;
+  font-size: clamp(0.72rem, 1.05vw, 1rem);
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.credits-panel a:not(.credits-title) {
+  color: #9e5f7a;
+  font-weight: 950;
+  text-decoration: none;
+}
+
+.credits-close {
+  position: absolute;
+  top: 0.7vw;
+  right: 0.8vw;
+  width: 1.75vw;
+  min-width: 28px;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 999px;
+  color: #7c5145;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(213, 161, 139, 0.38);
+  font-weight: 950;
+  cursor: pointer;
+}
+
+@keyframes creditsButtonWiggle {
+  0%,
+  1.6%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  0.25% {
+    transform: rotate(-5deg) translateY(-1px);
+  }
+
+  0.5% {
+    transform: rotate(5deg) translateY(-1px);
+  }
+
+  0.75% {
+    transform: rotate(-4deg) translateY(0);
+  }
+
+  1% {
+    transform: rotate(4deg) translateY(0);
+  }
+}
+
+.layout-inspector {
+  position: absolute;
+  right: 2.8%;
+  top: 10%;
+  width: min(31%, 360px);
+  max-height: 66%;
+  padding: 0.85vw;
+  display: grid;
+  gap: 0.65vw;
+  overflow: hidden;
+  border-radius: 22px;
+  color: #5f4036;
+  background: #fff8ed;
+  box-shadow:
+    0 20px 34px rgba(93, 61, 43, 0.19),
+    inset 0 0 0 1px rgba(255, 220, 190, 0.8);
+  pointer-events: auto;
+}
+
+.inspector-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.75vw;
+}
+
+.inspector-heading strong {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 1.45vw, 1.35rem);
+  line-height: 1;
+}
+
+.inspector-heading small,
+.inspector-select span,
+.inspector-grid label span {
+  color: #8d6659;
+  font-size: clamp(0.52rem, 0.72vw, 0.68rem);
+  font-weight: 850;
+}
+
+.inspector-collapse {
+  border: 0;
+  padding: 0.32vw 0.58vw;
+  border-radius: 999px;
+  color: #17485a;
+  background: #e7f6f8;
+  box-shadow: inset 0 0 0 1px rgba(120, 177, 191, 0.28);
+  font-size: clamp(0.5rem, 0.68vw, 0.64rem);
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.layout-inspector.collapsed {
+  width: auto;
+  max-width: 210px;
+  padding: 0.6vw 0.7vw;
+  border-radius: 999px;
+}
+
+.layout-inspector.collapsed .inspector-heading {
+  align-items: center;
+}
+
+.layout-inspector.collapsed .inspector-heading small {
+  display: none;
+}
+
+.layout-inspector.collapsed .inspector-heading strong {
+  font-size: clamp(0.78rem, 1vw, 1rem);
+}
+
+.inspector-select {
+  display: grid;
+  gap: 0.25vw;
+}
+
+.inspector-select select,
+.inspector-grid input {
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  color: #5f4036;
+  background: #fffefd;
+  box-shadow: inset 0 0 0 1px rgba(220, 178, 146, 0.58);
+  font: inherit;
+  font-weight: 850;
+}
+
+.inspector-select select {
+  padding: 0.45vw 0.55vw;
+}
+
+.inspector-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.42vw;
+}
+
+.inspector-grid label {
+  display: grid;
+  gap: 0.18vw;
+}
+
+.inspector-grid input {
+  padding: 0.38vw 0.42vw;
+  font-size: clamp(0.58rem, 0.78vw, 0.74rem);
+}
+
+.layout-position-table {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  align-content: start;
+  border-radius: 16px;
+  background: #fff1df;
+  box-shadow: inset 0 0 0 1px rgba(220, 178, 146, 0.42);
+}
+
+.layout-position-table .table-head,
+.layout-position-table button {
+  display: grid;
+  grid-template-columns: minmax(92px, 1.6fr) repeat(7, minmax(28px, 0.55fr));
+  gap: 0.25vw;
+  align-items: center;
+  padding: 0.32vw 0.42vw;
+  text-align: left;
+}
+
+.layout-position-table .table-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: #8d6659;
+  background: #ffe9d0;
+  font-size: clamp(0.48rem, 0.66vw, 0.62rem);
+  font-weight: 950;
+}
+
+.layout-position-table button {
+  border: 0;
+  border-top: 1px solid rgba(220, 178, 146, 0.32);
+  color: #65483d;
+  background: transparent;
+  font-size: clamp(0.48rem, 0.66vw, 0.62rem);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.layout-position-table button:hover,
+.layout-position-table button.selected-row {
+  background: #fffaf3;
+}
+
+.layout-position-table button span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layout-inline-editor {
+  position: absolute;
+  z-index: 90;
+  width: min(34%, 380px);
+  padding: 0.45vw;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.25vw;
+  transform: translateY(calc(-100% - 0.7vw));
+  border-radius: 16px;
+  color: #5f4036;
+  background: #fffaf1;
+  box-shadow:
+    0 14px 24px rgba(93, 61, 43, 0.18),
+    inset 0 0 0 1px rgba(255, 220, 190, 0.8);
+  pointer-events: auto;
+}
+
+.layout-inline-editor strong {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #70463a;
+  font-size: clamp(0.5rem, 0.72vw, 0.68rem);
+  line-height: 1;
+}
+
+.layout-inline-editor label {
+  display: grid;
+  gap: 0.1vw;
+}
+
+.layout-inline-editor label span {
+  color: #8d6659;
+  font-size: clamp(0.42rem, 0.58vw, 0.54rem);
+  font-weight: 950;
+}
+
+.layout-inline-editor input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  border-radius: 9px;
+  padding: 0.24vw 0.28vw;
+  color: #5f4036;
+  background: #fffefd;
+  box-shadow: inset 0 0 0 1px rgba(220, 178, 146, 0.58);
+  font: inherit;
+  font-size: clamp(0.48rem, 0.66vw, 0.62rem);
+  font-weight: 850;
+}
+
+.game-stage.show-layout-boxes [data-layout-label],
+.game-stage.show-character-anchors .character-sticker,
+.game-stage.show-ingredient-hitboxes .table-ingredient {
+  outline: 2px dashed rgba(58, 130, 160, 0.58);
+  outline-offset: 0;
+}
+
+.game-stage.show-layout-boxes [data-layout-label]::after,
+.game-stage.show-character-anchors .character-sticker::after,
+.game-stage.show-ingredient-hitboxes .table-ingredient::after {
+  content: attr(data-layout-label);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  padding: 2px 5px;
+  border-radius: 999px;
+  color: #17485a;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+@media (max-width: 760px) {
+  .play-shell {
+    padding: 8px;
+  }
+
+  .game-stage {
+    width: min(calc(100vw - 16px), calc(100vh - 16px));
+    border-radius: 22px;
+  }
+
+  .game-stage .stage-title {
+    font-size: clamp(1rem, 4.4vw, 1.8rem);
+  }
+
+  .game-stage .mini-score-strip {
+    gap: 0.35vw;
+  }
+
+  .game-stage .mini-score-strip span {
+    padding: 0.4vw 0.52vw;
+    font-size: clamp(0.46rem, 1.9vw, 0.62rem);
+  }
+
+  .game-stage .recipe-note {
+    left: 4%;
+    top: 20%;
+    width: 22%;
+    padding: 1.3vw 1vw 1vw;
+  }
+
+  .game-stage .yuto-character {
+    left: 22%;
+    top: 18%;
+    width: 26%;
+    height: 53%;
+  }
+
+  .game-stage .akari-character {
+    left: 53%;
+    top: 18%;
+    width: 29%;
+    height: 54%;
+  }
+
+  .prep-layer {
+    left: 31%;
+    top: 55.5%;
+    width: 38%;
+    height: 23.5%;
+  }
+
+  .mochi-layer {
+    left: 41%;
+    top: 82%;
+    width: 18%;
+  }
+}
