@@ -294,6 +294,7 @@ function App() {
   const [musicEnabled, setMusicEnabled] = useState(true)
   const [musicStarted, setMusicStarted] = useState(false)
   const [creditsOpen, setCreditsOpen] = useState(false)
+  const [conceptOpen, setConceptOpen] = useState(false)
   const [compactRecipeNote, setCompactRecipeNote] = useState(false)
   const [editMode, setEditMode] = useState(loadInitialEditMode)
   const [layoutOverrides, setLayoutOverrides] = useState(loadLayoutOverrides)
@@ -312,17 +313,16 @@ function App() {
   const mochiTimerProgress = clamp(mochiTimeLeft / MOCHI_TIMER_MS, 0, 1)
   const mochiSecondsLeft = Math.max(0, Math.ceil(mochiTimeLeft / 1000))
   const akariBubbleMode = catNeedsPet ? 'cat' : recipeReadyToFinish ? 'action' : null
+  const defaultPrepInstruction = catNeedsPet
+    ? 'Tap Mochi to keep cooking'
+    : nextIngredient
+      ? selectedIngredient
+        ? `Tap mat to add ${selectedIngredient}`
+        : `Tap ${nextIngredient}`
+      : recipe.finishLabel
   const desktopPrepInstruction =
-    instructionMessage ?? (catNeedsPet ? 'Tap Mochi to keep cooking' : nextIngredient ? `Drop ${nextIngredient}` : recipe.finishLabel)
-  const mobilePrepInstruction =
-    instructionMessage ??
-    (catNeedsPet
-      ? 'Tap Mochi to keep cooking'
-      : nextIngredient
-        ? selectedIngredient
-          ? `Tap mat to add ${selectedIngredient}`
-          : 'Tap ingredient, then tap mat'
-        : recipe.finishLabel)
+    instructionMessage ?? defaultPrepInstruction
+  const mobilePrepInstruction = instructionMessage ?? defaultPrepInstruction
   const playBackgroundMusic = useCallback(
     (force = false) => {
       const audio = musicRef.current
@@ -662,7 +662,7 @@ function App() {
     }, 1300)
   }
 
-  const showInstruction = (text: string, tone: typeof instructionTone = 'hint') => {
+  const showInstruction = (text: string, tone: typeof instructionTone = 'hint', duration = 1400) => {
     if (instructionTimerRef.current) {
       window.clearTimeout(instructionTimerRef.current)
     }
@@ -671,7 +671,7 @@ function App() {
     setInstructionTone(tone)
     instructionTimerRef.current = window.setTimeout(() => {
       setInstructionMessage(null)
-    }, 1400)
+    }, duration)
   }
 
   const addScore = (points: number) => {
@@ -698,7 +698,7 @@ function App() {
     }
 
     setSelectedIngredient(ingredient)
-    showInstruction(`${ingredient} picked up`, ingredient === nextIngredient ? 'good' : 'hint')
+    showInstruction(ingredient === nextIngredient ? `Tap mat to add ${ingredient}` : `Need ${nextIngredient}`, ingredient === nextIngredient ? 'good' : 'hint')
   }
 
   const placeIngredient = (ingredient: string | null) => {
@@ -766,12 +766,15 @@ function App() {
       setMochiRecipeStreak(0)
       resetMochiTimer()
       celebrateMochi()
-      showInstruction(`Mochi loves the cafe rush +${pointsEarned}`, 'cat')
+      showInstruction(`${recipe.name} served +${POINTS_PER_DISH}`, 'good', 820)
+      window.setTimeout(() => {
+        showInstruction(`Cafe rush bonus +${POINTS_STREAK_BONUS}`, 'cat', 1400)
+      }, 900)
       return
     }
 
     setMochiRecipeStreak(nextStreak)
-    showInstruction(`${recipe.name} served +${pointsEarned}`, 'good')
+    showInstruction(`${recipe.name} served +${POINTS_PER_DISH}`, 'good', 1050)
   }
 
   const petCat = () => {
@@ -817,7 +820,7 @@ function App() {
 
     setDraggedIngredient(ingredient)
     setSelectedIngredient(ingredient)
-    showInstruction(`${ingredient} picked up`, ingredient === nextIngredient ? 'good' : 'hint')
+    showInstruction(ingredient === nextIngredient ? `Drop ${ingredient} on mat` : `Need ${nextIngredient}`, ingredient === nextIngredient ? 'good' : 'hint')
   }
 
   const handleDragEnd = () => {
@@ -834,6 +837,14 @@ function App() {
     <div className="play-shell">
       <main ref={stageRef} className={`game-stage ${stageDebugClasses}`} aria-label="Kawaii Cat Cafe cooking stage">
         <img src="/assets/backgrounds/kawaii-room-layer.png" alt="" className="stage-layer room-layer" draggable={false} />
+        <button
+          type="button"
+          className="wall-title-button"
+          aria-label="Open original game concept artwork"
+          onClick={() => setConceptOpen(true)}
+        >
+          <img src="/assets/backgrounds/gametitle.png" alt="" draggable={false} />
+        </button>
 
         <div className="characters-layer" aria-label="Cafe helpers">
           {Object.values(CHEFS).map((person) => (
@@ -1116,17 +1127,6 @@ function App() {
                   </li>
                 )
               })}
-              {recipeReadyToFinish ? (
-                <li className="mobile-ready-step">
-                  <span className="ingredient-badge">
-                    <img src={getRecipeThumbnail(recipe)} alt="" />
-                  </span>
-                  <div>
-                    <strong>{recipe.finishLabel}</strong>
-                    <small>Ready</small>
-                  </div>
-                </li>
-              ) : null}
             </ol>
             <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'recipe', STAGE_LAYOUT.recipe, 'resize')} />
           </article>
@@ -1169,11 +1169,25 @@ function App() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Janelle
+                    Janelle Y
                   </a>
                   .
                 </p>
-                <p>Game design and development by Le Binh Anh Nguyen.</p>
+                <p>
+                  Game design and development by{' '}
+                  <a href="mailto:binhanhpiano96@gmail.com">Le Binh Anh Nguyen</a>.
+                </p>
+              </div>
+            </div>
+          ) : null}
+
+          {conceptOpen ? (
+            <div className="concept-overlay" role="dialog" aria-modal="true" aria-label="Original game concept artwork">
+              <div className="concept-panel">
+                <button type="button" className="credits-close" aria-label="Close concept art" onClick={() => setConceptOpen(false)}>
+                  x
+                </button>
+                <img src="/assets/backgrounds/gameconcept.jpeg" alt="Original Kawaii Cat Cafe game concept by Janelle Y" />
               </div>
             </div>
           ) : null}

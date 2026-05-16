@@ -1945,6 +1945,40 @@
   z-index: 0;
 }
 
+.wall-title-button {
+  position: absolute;
+  z-index: 2;
+  left: 32%;
+  top: 5.7%;
+  width: 34%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  opacity: 0.44;
+  mix-blend-mode: multiply;
+  filter: saturate(0.82) sepia(0.08);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.wall-title-button img {
+  display: block;
+  width: 100%;
+  height: auto;
+  -webkit-user-drag: none;
+}
+
+.wall-title-button:hover,
+.wall-title-button:focus-visible {
+  opacity: 0.52;
+}
+
+.wall-title-button:focus-visible {
+  outline: 2px solid rgba(192, 130, 138, 0.42);
+  outline-offset: 0.22vw;
+  border-radius: 18px;
+}
+
 .characters-layer {
   position: absolute;
   inset: 0;
@@ -2239,7 +2273,7 @@
   text-align: center;
   text-overflow: ellipsis;
   overflow-wrap: anywhere;
-  font-size: clamp(0.48rem, 0.74vw, 0.74rem);
+  font-size: clamp(0.56rem, 0.84vw, 0.84rem);
   line-height: 1.06;
   white-space: normal;
 }
@@ -2810,10 +2844,6 @@
   height: clamp(24px, 2.35vw, 38px);
 }
 
-.game-stage .recipe-note .mobile-ready-step {
-  display: none;
-}
-
 .game-stage .recipe-note .ingredient-badge {
   width: clamp(21px, 2vw, 32px);
   height: clamp(21px, 2vw, 32px);
@@ -2839,7 +2869,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #70463a;
-  font-size: clamp(0.5rem, 0.72vw, 0.68rem);
+  font-size: clamp(0.58rem, 0.82vw, 0.78rem);
   line-height: 1.05;
 }
 
@@ -2850,7 +2880,7 @@
   white-space: nowrap;
   margin-top: 0.14vw;
   color: #9a6a59;
-  font-size: clamp(0.44rem, 0.6vw, 0.58rem);
+  font-size: clamp(0.52rem, 0.72vw, 0.68rem);
   line-height: 1;
 }
 
@@ -2918,7 +2948,8 @@
   animation: creditsButtonWiggle 75s ease-in-out infinite;
 }
 
-.credits-overlay {
+.credits-overlay,
+.concept-overlay {
   position: absolute;
   inset: 0;
   z-index: 95;
@@ -2928,6 +2959,10 @@
   background: rgba(59, 41, 34, 0.58);
   backdrop-filter: blur(2px);
   pointer-events: auto;
+}
+
+.concept-overlay {
+  background: rgba(59, 41, 34, 0.62);
 }
 
 .credits-panel {
@@ -2989,6 +3024,29 @@
   box-shadow: inset 0 0 0 1px rgba(213, 161, 139, 0.38);
   font-weight: 950;
   cursor: pointer;
+}
+
+.concept-panel {
+  position: relative;
+  width: min(55%, 600px);
+  padding: 0.85vw;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 20% 12%, rgba(255, 255, 255, 0.9), transparent 28%),
+    linear-gradient(180deg, rgba(255, 251, 245, 0.98), rgba(255, 237, 226, 0.96));
+  box-shadow:
+    0 30px 60px rgba(34, 22, 18, 0.34),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+}
+
+.concept-panel img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 72vh;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 1px rgba(126, 82, 70, 0.08);
 }
 
 @keyframes creditsButtonWiggle {
@@ -3348,38 +3406,40 @@
   }
 
   .game-stage .recipe-note .recipe-checklist {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.1vw;
     padding-left: 0.9vw;
     overflow: visible;
   }
 
   .game-stage .recipe-note .recipe-checklist li {
-    display: none;
+    display: grid;
+    place-items: center;
+    padding: 0.62vw;
+    aspect-ratio: 1;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.46);
   }
 
-  .game-stage .recipe-note .recipe-checklist li.current,
-  .game-stage .recipe-note .recipe-checklist li.mobile-ready-step {
-    display: flex;
-    gap: 0.75vw;
-    padding: 0.74vw 0.82vw;
-    border-radius: 14px;
+  .game-stage .recipe-note .recipe-checklist li.current {
+    background: #f3ffe9;
+    box-shadow: 0 0 0 2px rgba(159, 218, 151, 0.28);
   }
 
-  .game-stage .recipe-note .recipe-checklist li.mobile-ready-step {
-    background: #fff7df;
+  .game-stage .recipe-note .recipe-checklist li.done {
+    opacity: 0.58;
   }
 
   .game-stage .recipe-note .ingredient-badge {
-    width: clamp(27px, 7vw, 38px);
-    height: clamp(27px, 7vw, 38px);
-    border-radius: 12px;
+    width: clamp(30px, 8vw, 44px);
+    height: clamp(30px, 8vw, 44px);
+    border-radius: 999px;
   }
 
-  .game-stage .recipe-note .recipe-checklist strong {
-    font-size: clamp(0.6rem, 2.7vw, 0.82rem);
-  }
-
+  .game-stage .recipe-note .recipe-checklist li > div,
+  .game-stage .recipe-note .recipe-checklist strong,
   .game-stage .recipe-note .recipe-checklist small {
-    font-size: clamp(0.5rem, 2.15vw, 0.68rem);
+    display: none;
   }
 
   .game-stage .yuto-character {
