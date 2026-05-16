@@ -37,7 +37,7 @@ const BEST_SCORE_KEY = 'kawaii-cat-cafe-best-score'
 const LAYOUT_STORAGE_KEY = 'kawaii-cat-cafe-layout-overrides-v5'
 const BACKGROUND_MUSIC_SRC = '/assets/audio/kawaii-cat-cafe-score.mp3'
 const MUSIC_RESTART_GAP_MS = 1000
-const MOCHI_TIMER_MS = 30000
+const MOCHI_TIMER_MS = 20000
 const MOCHI_STREAK_TARGET = 3
 const POINTS_PER_DISH = 10
 const POINTS_PER_NEEDED_PET = 14
@@ -312,6 +312,17 @@ function App() {
   const mochiTimerProgress = clamp(mochiTimeLeft / MOCHI_TIMER_MS, 0, 1)
   const mochiSecondsLeft = Math.max(0, Math.ceil(mochiTimeLeft / 1000))
   const akariBubbleMode = catNeedsPet ? 'cat' : recipeReadyToFinish ? 'action' : null
+  const desktopPrepInstruction =
+    instructionMessage ?? (catNeedsPet ? 'Tap Mochi to keep cooking' : nextIngredient ? `Drop ${nextIngredient}` : recipe.finishLabel)
+  const mobilePrepInstruction =
+    instructionMessage ??
+    (catNeedsPet
+      ? 'Tap Mochi to keep cooking'
+      : nextIngredient
+        ? selectedIngredient
+          ? `Tap mat to add ${selectedIngredient}`
+          : 'Tap ingredient, then tap mat'
+        : recipe.finishLabel)
   const playBackgroundMusic = useCallback(
     (force = false) => {
       const audio = musicRef.current
@@ -970,7 +981,10 @@ function App() {
                 <strong>{recipe.finishLabel}</strong>
               </button>
             ) : (
-              <strong>{instructionMessage ?? (catNeedsPet ? 'Tap Mochi to keep cooking' : nextIngredient ? `Drop ${nextIngredient}` : recipe.finishLabel)}</strong>
+              <>
+                <strong className="prep-copy-text desktop-copy">{desktopPrepInstruction}</strong>
+                <strong className="prep-copy-text mobile-copy">{mobilePrepInstruction}</strong>
+              </>
             )}
           </div>
           <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'prepHint', STAGE_LAYOUT.prepHint, 'resize')} />
@@ -1102,6 +1116,17 @@ function App() {
                   </li>
                 )
               })}
+              {recipeReadyToFinish ? (
+                <li className="mobile-ready-step">
+                  <span className="ingredient-badge">
+                    <img src={getRecipeThumbnail(recipe)} alt="" />
+                  </span>
+                  <div>
+                    <strong>{recipe.finishLabel}</strong>
+                    <small>Ready</small>
+                  </div>
+                </li>
+              ) : null}
             </ol>
             <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'recipe', STAGE_LAYOUT.recipe, 'resize')} />
           </article>

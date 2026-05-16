@@ -2244,6 +2244,10 @@
   white-space: normal;
 }
 
+.game-stage .prep-copy .mobile-copy {
+  display: none;
+}
+
 .game-stage .prep-copy.good {
   background: rgba(244, 255, 235, 0.86);
   box-shadow:
@@ -2382,6 +2386,13 @@
   opacity: 0;
   transform: scale(0.9);
   transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.game-stage .table-ingredient::after {
+  content: '';
+  position: absolute;
+  inset: -16%;
+  border-radius: 28px;
 }
 
 .game-stage .table-ingredient img {
@@ -2797,6 +2808,10 @@
 .game-stage .recipe-note.compact-steps .ingredient-badge {
   width: clamp(24px, 2.35vw, 38px);
   height: clamp(24px, 2.35vw, 38px);
+}
+
+.game-stage .recipe-note .mobile-ready-step {
+  display: none;
 }
 
 .game-stage .recipe-note .ingredient-badge {
@@ -3245,6 +3260,53 @@
     border-radius: 22px;
   }
 
+  .game-stage .prep-hit-area::after,
+  .game-stage .prep-hint-layer::after,
+  .game-stage .cat-button::after {
+    content: '';
+    position: absolute;
+    inset: -24%;
+    border-radius: 30px;
+  }
+
+  .game-stage .prep-hit-area {
+    touch-action: manipulation;
+  }
+
+  .game-stage .prep-action-button,
+  .game-stage .cat-button,
+  .game-stage .table-ingredient {
+    touch-action: manipulation;
+  }
+
+  .game-stage .table-ingredient::after {
+    inset: -34%;
+    border-radius: 32px;
+  }
+
+  .game-stage .table-ingredient.selected::before {
+    opacity: 1;
+    transform: scale(1.12);
+    background:
+      radial-gradient(circle, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.16) 62%, transparent 75%),
+      color-mix(in srgb, var(--ingredient-accent, #df7c69) 26%, transparent);
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--ingredient-accent, #df7c69) 48%, transparent),
+      0 12px 20px rgba(120, 70, 50, 0.16);
+  }
+
+  .game-stage .table-ingredient.selected img {
+    transform: translateY(-6px) scale(calc(var(--image-scale, 1) * 1.12));
+  }
+
+  .game-stage .prep-copy .desktop-copy {
+    display: none;
+  }
+
+  .game-stage .prep-copy .mobile-copy {
+    display: block;
+  }
+
   .game-stage .stage-title {
     font-size: clamp(1rem, 4.4vw, 1.8rem);
   }
@@ -3263,6 +3325,61 @@
     top: 20%;
     width: 22%;
     padding: 1.3vw 1vw 1vw;
+    grid-template-rows: auto auto minmax(0, auto);
+  }
+
+  .game-stage .recipe-note .order-hero {
+    gap: 0.7vw;
+    margin-bottom: 0.72vw;
+  }
+
+  .game-stage .recipe-note .order-thumb {
+    width: clamp(30px, 8.4vw, 42px);
+    height: clamp(30px, 8.4vw, 42px);
+    border-radius: 12px;
+  }
+
+  .game-stage .recipe-note .order-hero strong {
+    font-size: clamp(0.72rem, 3.1vw, 0.95rem);
+  }
+
+  .game-stage .recipe-note .order-hero small {
+    font-size: clamp(0.52rem, 2.25vw, 0.7rem);
+  }
+
+  .game-stage .recipe-note .recipe-checklist {
+    padding-left: 0.9vw;
+    overflow: visible;
+  }
+
+  .game-stage .recipe-note .recipe-checklist li {
+    display: none;
+  }
+
+  .game-stage .recipe-note .recipe-checklist li.current,
+  .game-stage .recipe-note .recipe-checklist li.mobile-ready-step {
+    display: flex;
+    gap: 0.75vw;
+    padding: 0.74vw 0.82vw;
+    border-radius: 14px;
+  }
+
+  .game-stage .recipe-note .recipe-checklist li.mobile-ready-step {
+    background: #fff7df;
+  }
+
+  .game-stage .recipe-note .ingredient-badge {
+    width: clamp(27px, 7vw, 38px);
+    height: clamp(27px, 7vw, 38px);
+    border-radius: 12px;
+  }
+
+  .game-stage .recipe-note .recipe-checklist strong {
+    font-size: clamp(0.6rem, 2.7vw, 0.82rem);
+  }
+
+  .game-stage .recipe-note .recipe-checklist small {
+    font-size: clamp(0.5rem, 2.15vw, 0.68rem);
   }
 
   .game-stage .yuto-character {
