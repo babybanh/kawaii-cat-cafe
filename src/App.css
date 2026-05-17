@@ -1277,6 +1277,33 @@
     padding: 8px;
   }
 
+  .credits-panel {
+    width: min(80%, 360px);
+    padding: 24px 22px 22px;
+    border-radius: 24px 26px 22px 28px;
+  }
+
+  .credits-title {
+    font-size: clamp(1.35rem, 6.4vw, 1.9rem);
+    line-height: 0.95;
+  }
+
+  .credits-panel p {
+    margin-top: 18px;
+    font-size: clamp(0.82rem, 4.1vw, 1.08rem);
+    line-height: 1.22;
+  }
+
+  .credits-panel a:not(.credits-title) {
+    font-size: 1em;
+  }
+
+  .credits-close {
+    top: 9px;
+    right: 10px;
+    width: 32px;
+  }
+
   .game-stage {
     width: min(calc(100vw - 16px), calc(100vh - 16px));
     border-radius: 22px;
@@ -1948,13 +1975,13 @@
 .wall-title-button {
   position: absolute;
   z-index: 2;
-  left: 32%;
-  top: 5.7%;
-  width: 34%;
+  left: 34%;
+  top: 6.2%;
+  width: 30%;
   padding: 0;
   border: 0;
   background: transparent;
-  opacity: 0.44;
+  opacity: 0.38;
   mix-blend-mode: multiply;
   filter: saturate(0.82) sepia(0.08);
   pointer-events: auto;
@@ -1970,7 +1997,7 @@
 
 .wall-title-button:hover,
 .wall-title-button:focus-visible {
-  opacity: 0.52;
+  opacity: 0.46;
 }
 
 .wall-title-button:focus-visible {
@@ -2618,13 +2645,14 @@
   position: absolute;
   left: 5%;
   top: 3.4%;
-  padding: 0.42vw 1.05vw 0.56vw;
+  padding: 0.38vw 0.88vw 0.5vw;
   border-radius: 24px 28px 26px 22px;
   color: #7c5145;
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 3vw, 2.9rem);
+  font-size: clamp(1.25rem, 2.35vw, 2.45rem);
   line-height: 0.95;
   letter-spacing: 0.02em;
+  white-space: nowrap;
   background:
     linear-gradient(180deg, rgba(255, 252, 245, 0.96), rgba(255, 235, 221, 0.92));
   box-shadow:
@@ -2645,11 +2673,11 @@
 }
 
 .game-stage .mini-score-strip span {
-  padding: 0.45vw 0.7vw;
+  padding: 0.56vw 0.86vw;
   border-radius: 999px;
   color: #7c5145;
   font-weight: 900;
-  font-size: clamp(0.56rem, 0.86vw, 0.78rem);
+  font-size: clamp(0.66rem, 1vw, 0.92rem);
   background: rgba(255, 249, 240, 0.64);
   box-shadow: 0 8px 14px rgba(121, 89, 73, 0.08);
 }
@@ -2662,9 +2690,10 @@
   max-height: 34%;
   box-sizing: border-box;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  row-gap: 0.28vw;
   overflow: hidden;
-  padding: 0.72vw 0.72vw 0.68vw;
+  padding: 0.62vw 0.62vw 0.58vw;
   border-radius: 20px 22px 24px 19px;
   color: #70463a;
   background:
@@ -2674,10 +2703,11 @@
     0 14px 20px rgba(121, 89, 73, 0.13),
     inset 0 0 0 1px rgba(255, 228, 205, 0.76);
   transform: rotate(var(--rotation, -1.4deg));
+  transform-origin: left center;
   pointer-events: auto;
 }
 
-.game-stage .recipe-note > *:not(.recipe-timer-border) {
+.game-stage .recipe-note > *:not(.recipe-timer-border):not(.recipe-pin) {
   position: relative;
   z-index: 1;
 }
@@ -2732,13 +2762,17 @@
   display: flex;
   align-items: center;
   min-width: 0;
-  gap: 0.44vw;
-  margin: 0 0 0.44vw;
+  gap: 0.34vw;
+  margin: 0;
+}
+
+.game-stage .recipe-note .order-hero > div {
+  min-width: 0;
 }
 
 .game-stage .recipe-note .order-thumb {
-  width: clamp(28px, 3.1vw, 46px);
-  height: clamp(28px, 3.1vw, 46px);
+  width: clamp(24px, 2.55vw, 40px);
+  height: clamp(24px, 2.55vw, 40px);
   min-width: 0;
   min-height: 0;
   flex: 0 0 auto;
@@ -2761,26 +2795,32 @@
 
 .game-stage .recipe-note .order-hero strong {
   display: block;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: #70463a;
-  font-size: clamp(0.6rem, 0.94vw, 0.9rem);
-  line-height: 1.05;
+  font-size: clamp(0.56rem, 0.82vw, 0.78rem);
+  line-height: 1;
 }
 
 .game-stage .recipe-note .order-hero small {
   display: block;
-  margin-top: 0.2vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 0.12vw;
   color: #9a6a59;
-  font-size: clamp(0.48rem, 0.68vw, 0.66rem);
+  font-size: clamp(0.44rem, 0.6vw, 0.58rem);
   line-height: 1.1;
 }
 
 .game-stage .recipe-note .recipe-checklist {
   display: grid;
-  gap: 0.36vw;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: clamp(2px, 0.22vw, 4px);
   min-height: 0;
   overflow: hidden;
-  padding: 0 0 0 0.74vw;
+  padding: 0 0 0 clamp(5px, 0.45vw, 8px);
   margin: 0;
   list-style: none;
 }
@@ -2798,9 +2838,10 @@
   display: flex;
   align-items: center;
   min-width: 0;
-  gap: 0.36vw;
-  padding: 0.26vw 0.32vw;
-  border-radius: 12px;
+  min-height: 0;
+  gap: clamp(3px, 0.28vw, 6px);
+  padding: clamp(2px, 0.18vw, 4px) clamp(3px, 0.24vw, 5px);
+  border-radius: 10px;
   box-sizing: border-box;
   background: #fff7ed;
 }
@@ -2810,7 +2851,7 @@
 }
 
 .game-stage .recipe-note .recipe-checklist li.current {
-  background: #f3ffe9;
+  background: rgba(242, 255, 233, 0.68);
 }
 
 .game-stage .recipe-note .recipe-checklist li.done {
@@ -2824,15 +2865,25 @@
 
 .game-stage .recipe-note.compact-steps .recipe-checklist {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.32vw;
+  grid-template-rows: none;
+  gap: 0.24vw;
   overflow: hidden;
   padding-left: 0;
 }
 
+.game-stage .recipe-note.compact-steps {
+  height: auto !important;
+  grid-template-rows: auto auto;
+  align-content: start;
+  row-gap: clamp(5px, 0.5vw, 8px);
+  transform: translateY(var(--recipe-compact-y, 0px)) rotate(var(--rotation, -1.4deg));
+}
+
 .game-stage .recipe-note.compact-steps .recipe-checklist li {
   justify-content: center;
-  padding: 0.2vw;
+  padding: 0.16vw;
   aspect-ratio: 1;
+  min-height: 0;
 }
 
 .game-stage .recipe-note.compact-steps .recipe-checklist li > div {
@@ -2840,17 +2891,17 @@
 }
 
 .game-stage .recipe-note.compact-steps .ingredient-badge {
-  width: clamp(24px, 2.35vw, 38px);
-  height: clamp(24px, 2.35vw, 38px);
+  width: 82%;
+  height: 82%;
 }
 
 .game-stage .recipe-note .ingredient-badge {
-  width: clamp(21px, 2vw, 32px);
-  height: clamp(21px, 2vw, 32px);
+  width: clamp(18px, 1.55vw, 28px);
+  height: clamp(18px, 1.55vw, 28px);
   min-width: 0;
   min-height: 0;
   flex: 0 0 auto;
-  border-radius: 11px;
+  border-radius: 999px;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -2858,8 +2909,8 @@
 }
 
 .game-stage .recipe-note .ingredient-badge img {
-  width: 148%;
-  height: 148%;
+  width: 108%;
+  height: 108%;
   object-fit: contain;
 }
 
@@ -2869,7 +2920,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #70463a;
-  font-size: clamp(0.58rem, 0.82vw, 0.78rem);
+  font-size: clamp(0.48rem, 0.64vw, 0.64rem);
   line-height: 1.05;
 }
 
@@ -2880,7 +2931,7 @@
   white-space: nowrap;
   margin-top: 0.14vw;
   color: #9a6a59;
-  font-size: clamp(0.52rem, 0.72vw, 0.68rem);
+  font-size: clamp(0.42rem, 0.54vw, 0.54rem);
   line-height: 1;
 }
 
@@ -2915,6 +2966,26 @@
   color: #bd6b7a;
 }
 
+.ingredient-flyer {
+  position: absolute;
+  left: calc(var(--fly-from-x) - (var(--fly-size) / 2));
+  top: calc(var(--fly-from-y) - (var(--fly-size) / 2));
+  z-index: 44;
+  width: var(--fly-size);
+  height: var(--fly-size);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  animation: ingredientFlyToMat 820ms cubic-bezier(0.18, 0.9, 0.24, 1) forwards;
+}
+
+.ingredient-flyer img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 18px rgba(120, 70, 50, 0.2));
+}
+
 .layout-editor {
   position: absolute;
   right: 3.5%;
@@ -2927,11 +2998,11 @@
 
 .layout-editor button {
   border: 0;
-  padding: 0.45vw 0.7vw;
+  padding: 0.58vw 0.92vw;
   border-radius: 999px;
   color: #70463a;
   font-weight: 900;
-  font-size: clamp(0.52rem, 0.82vw, 0.74rem);
+  font-size: clamp(0.64rem, 0.96vw, 0.9rem);
   background: rgba(255, 247, 237, 0.76);
   box-shadow:
     0 9px 16px rgba(121, 89, 73, 0.12),
@@ -2946,6 +3017,8 @@
 
 .layout-editor .credits-toggle {
   animation: creditsButtonWiggle 75s ease-in-out infinite;
+  animation-delay: 4s;
+  transform-origin: 50% 60%;
 }
 
 .credits-overlay,
@@ -2967,8 +3040,8 @@
 
 .credits-panel {
   position: relative;
-  width: min(48%, 520px);
-  padding: 2vw 2.2vw 1.8vw;
+  width: min(54%, 620px);
+  padding: 2vw 2.35vw 1.95vw;
   border-radius: 28px 30px 26px 32px;
   color: #664236;
   text-align: center;
@@ -2985,7 +3058,7 @@
   max-width: 100%;
   color: #7b4a3d;
   font-family: var(--font-display);
-  font-size: clamp(1.2rem, 2.4vw, 2.25rem);
+  font-size: clamp(1.35rem, 2.35vw, 2.35rem);
   font-weight: 950;
   line-height: 1;
   text-decoration: none;
@@ -2999,14 +3072,20 @@
 .credits-panel p {
   margin: 1vw 0 0;
   color: #79564d;
-  font-size: clamp(0.72rem, 1.05vw, 1rem);
+  font-size: clamp(0.92rem, 1.18vw, 1.14rem);
   font-weight: 850;
   line-height: 1.35;
+}
+
+.credits-panel p span,
+.credits-panel p a {
+  display: block;
 }
 
 .credits-panel a:not(.credits-title) {
   color: #9e5f7a;
   font-weight: 950;
+  font-size: 1.08em;
   text-decoration: none;
 }
 
@@ -3028,8 +3107,8 @@
 
 .concept-panel {
   position: relative;
-  width: min(55%, 600px);
-  padding: 0.85vw;
+  width: min(70%, 820px);
+  padding: 1vw;
   border-radius: 18px;
   background:
     radial-gradient(circle at 20% 12%, rgba(255, 255, 255, 0.9), transparent 28%),
@@ -3043,7 +3122,7 @@
   display: block;
   width: 100%;
   height: auto;
-  max-height: 72vh;
+  max-height: 82vh;
   object-fit: contain;
   border-radius: 0;
   box-shadow: inset 0 0 0 1px rgba(126, 82, 70, 0.08);
@@ -3051,25 +3130,50 @@
 
 @keyframes creditsButtonWiggle {
   0%,
-  1.6%,
+  4%,
   100% {
-    transform: rotate(0deg) translateY(0);
+    transform: rotate(0deg) translateY(0) scale(1);
   }
 
-  0.25% {
-    transform: rotate(-5deg) translateY(-1px);
+  0.55% {
+    transform: rotate(-7deg) translateY(-2px) scale(1.05);
   }
 
-  0.5% {
-    transform: rotate(5deg) translateY(-1px);
+  1.1% {
+    transform: rotate(7deg) translateY(-2px) scale(1.05);
   }
 
-  0.75% {
-    transform: rotate(-4deg) translateY(0);
+  1.65% {
+    transform: rotate(-5deg) translateY(-1px) scale(1.03);
   }
 
-  1% {
-    transform: rotate(4deg) translateY(0);
+  2.2% {
+    transform: rotate(5deg) translateY(-1px) scale(1.03);
+  }
+
+  2.75% {
+    transform: rotate(-3deg) translateY(0) scale(1.01);
+  }
+
+  3.3% {
+    transform: rotate(3deg) translateY(0) scale(1.01);
+  }
+}
+
+@keyframes ingredientFlyToMat {
+  0% {
+    opacity: 0.85;
+    transform: translate(0, 0) scale(0.72);
+  }
+
+  62% {
+    opacity: 1;
+    transform: translate(var(--fly-mid-x), var(--fly-mid-y)) scale(1.08);
+  }
+
+  100% {
+    opacity: 0.08;
+    transform: translate(var(--fly-delta-x), var(--fly-delta-y)) scale(0.72);
   }
 }
 
@@ -3366,7 +3470,7 @@
   }
 
   .game-stage .stage-title {
-    font-size: clamp(1rem, 4.4vw, 1.8rem);
+    font-size: clamp(0.94rem, 3.65vw, 1.55rem);
   }
 
   .game-stage .mini-score-strip {
@@ -3374,56 +3478,65 @@
   }
 
   .game-stage .mini-score-strip span {
-    padding: 0.4vw 0.52vw;
-    font-size: clamp(0.46rem, 1.9vw, 0.62rem);
+    padding: 0.48vw 0.68vw;
+    font-size: clamp(0.54rem, 2.05vw, 0.7rem);
   }
 
   .game-stage .recipe-note {
-    left: 4%;
-    top: 20%;
-    width: 22%;
-    padding: 1.3vw 1vw 1vw;
-    grid-template-rows: auto auto minmax(0, auto);
+    left: 4.7%;
+    top: 21%;
+    width: 27.5% !important;
+    height: 19.5% !important;
+    padding: 1.28vw 0.85vw 0.78vw;
+    grid-template-rows: auto auto;
+    align-content: start;
+    row-gap: 1.25vw;
   }
 
   .game-stage .recipe-note .order-hero {
-    gap: 0.7vw;
-    margin-bottom: 0.72vw;
+    gap: 0.55vw;
+    margin-bottom: 0;
   }
 
   .game-stage .recipe-note .order-thumb {
-    width: clamp(30px, 8.4vw, 42px);
-    height: clamp(30px, 8.4vw, 42px);
+    width: clamp(24px, 6.5vw, 34px);
+    height: clamp(24px, 6.5vw, 34px);
     border-radius: 12px;
   }
 
   .game-stage .recipe-note .order-hero strong {
-    font-size: clamp(0.72rem, 3.1vw, 0.95rem);
+    font-size: clamp(0.56rem, 2vw, 0.76rem);
+    line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .game-stage .recipe-note .order-hero small {
-    font-size: clamp(0.52rem, 2.25vw, 0.7rem);
+    font-size: clamp(0.42rem, 1.55vw, 0.56rem);
   }
 
   .game-stage .recipe-note .recipe-checklist {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.1vw;
-    padding-left: 0.9vw;
-    overflow: visible;
+    grid-template-rows: none;
+    gap: 0.75vw;
+    padding-left: 0;
+    overflow: hidden;
+    align-items: start;
   }
 
   .game-stage .recipe-note .recipe-checklist li {
     display: grid;
     place-items: center;
-    padding: 0.62vw;
+    padding: 0.38vw;
     aspect-ratio: 1;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.46);
   }
 
   .game-stage .recipe-note .recipe-checklist li.current {
-    background: #f3ffe9;
-    box-shadow: 0 0 0 2px rgba(159, 218, 151, 0.28);
+    background: rgba(242, 255, 233, 0.58);
+    box-shadow: none;
   }
 
   .game-stage .recipe-note .recipe-checklist li.done {
@@ -3431,8 +3544,8 @@
   }
 
   .game-stage .recipe-note .ingredient-badge {
-    width: clamp(30px, 8vw, 44px);
-    height: clamp(30px, 8vw, 44px);
+    width: 82%;
+    height: 82%;
     border-radius: 999px;
   }
 

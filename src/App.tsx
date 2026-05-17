@@ -37,7 +37,7 @@ const BEST_SCORE_KEY = 'kawaii-cat-cafe-best-score'
 const LAYOUT_STORAGE_KEY = 'kawaii-cat-cafe-layout-overrides-v5'
 const BACKGROUND_MUSIC_SRC = '/assets/audio/kawaii-cat-cafe-score.mp3'
 const MUSIC_RESTART_GAP_MS = 1000
-const MOCHI_TIMER_MS = 20000
+const MOCHI_TIMER_DURATIONS_MS = [40000, 30000, 20000]
 const MOCHI_STREAK_TARGET = 3
 const POINTS_PER_DISH = 10
 const POINTS_PER_NEEDED_PET = 14
@@ -55,6 +55,18 @@ type LayoutEditSession = {
   stageWidth: number
   stageHeight: number
   startLayout: IngredientLayout
+}
+
+type IngredientFlyAnimation = {
+  id: number
+  image: string
+  fromX: number
+  fromY: number
+  midX: number
+  midY: number
+  deltaX: number
+  deltaY: number
+  size: number
 }
 
 const INGREDIENT_LAYOUT: Record<string, IngredientLayout> = {
@@ -270,15 +282,19 @@ const RECIPE_LAYER_ASSETS: Partial<Record<RecipeId, Record<string, string>>> = {
 function App() {
   const stageRef = useRef<HTMLElement | null>(null)
   const recipeNoteRef = useRef<HTMLElement | null>(null)
+  const prepHitRef = useRef<HTMLDivElement | null>(null)
+  const ingredientRefs = useRef<Record<string, HTMLButtonElement | null>>({})
   const initialDevicePixelRatioRef = useRef(typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1)
   const layoutEditRef = useRef<LayoutEditSession | null>(null)
   const musicRef = useRef<HTMLAudioElement | null>(null)
   const musicEnabledRef = useRef(true)
   const musicGapTimerRef = useRef<number | null>(null)
+  const ingredientFlyIdRef = useRef(0)
   const [recipeIndex, setRecipeIndex] = useState(0)
   const [placedIngredients, setPlacedIngredients] = useState<string[]>([])
   const [selectedIngredient, setSelectedIngredient] = useState<string | null>(null)
   const [draggedIngredient, setDraggedIngredient] = useState<string | null>(null)
+  const [ingredientFly, setIngredientFly] = useState<IngredientFlyAnimation | null>(null)
   const [served, setServed] = useState(0)
   const [score, setScore] = useState(0)
   const [best, setBest] = useState(loadBestScore)
@@ -287,8 +303,10 @@ function App() {
   const [instructionMessage, setInstructionMessage] = useState<string | null>(null)
   const [instructionTone, setInstructionTone] = useState<'good' | 'wrong' | 'cat' | 'hint'>('hint')
   const [shakeIngredient, setShakeIngredient] = useState<string | null>(null)
-  const [mochiDeadline, setMochiDeadline] = useState(() => Date.now() + MOCHI_TIMER_MS)
-  const [mochiTimeLeft, setMochiTimeLeft] = useState(MOCHI_TIMER_MS)
+  const [, setMochiTimerStep] = useState(0)
+  const [mochiTimerDuration, setMochiTimerDuration] = useState(MOCHI_TIMER_DURATIONS_MS[0])
+  const [mochiDeadline, setMochiDeadline] = useState(() => Date.now() + MOCHI_TIMER_DURATIONS_MS[0])
+  const [mochiTimeLeft, setMochiTimeLeft] = useState(MOCHI_TIMER_DURATIONS_MS[0])
   const [mochiRecipeStreak, setMochiRecipeStreak] = useState(0)
   const [mochiCelebrating, setMochiCelebrating] = useState(false)
   const [musicEnabled, setMusicEnabled] = useState(true)
@@ -310,7 +328,7 @@ function App() {
   const nextIngredient = recipe.ingredients[placedIngredients.length] ?? null
   const catNeedsPet = mochiTimeLeft <= 0
   const recipeReadyToFinish = placedIngredients.length === recipe.ingredients.length
-  const mochiTimerProgress = clamp(mochiTimeLeft / MOCHI_TIMER_MS, 0, 1)
+  const mochiTimerProgress = clamp(mochiTimeLeft / mochiTimerDuration, 0, 1)
   const mochiSecondsLeft = Math.max(0, Math.ceil(mochiTimeLeft / 1000))
   const akariBubbleMode = catNeedsPet ? 'cat' : recipeReadyToFinish ? 'action' : null
   const defaultPrepInstruction = catNeedsPet
@@ -465,11 +483,21 @@ function App() {
       }
 
       note.classList.remove('compact-steps')
+      note.style.setProperty('--recipe-compact-y', '0px')
       const viewportScale = window.visualViewport?.scale ?? 1
       const deviceZoomRatio = (window.devicePixelRatio || 1) / initialDevicePixelRatioRef.current
       const zoomedPastCompactPoint = deviceZoomRatio >= 1.3 || viewportScale >= 1.3
-      const shouldCompact = zoomedPastCompactPoint && checklist.scrollHeight > checklist.clientHeight + 2
+      const noteRect = note.getBoundingClientRect()
+      const rowsDoNotFit = checklist.scrollHeight > checklist.clientHeight + 2
+      const isPhoneLayout = window.matchMedia('(max-width: 760px)').matches
+      const cardTooSmallForText = noteRect.width < 190 || noteRect.height < 165
+      const shouldCompact = isPhoneLayout || cardTooSmallForText || zoomedPastCompactPoint || rowsDoNotFit || checklist.scrollWidth > checklist.clientWidth + 2
       note.classList.toggle('compact-steps', shouldCompact)
+      if (shouldCompact) {
+        const compactHeight = note.getBoundingClientRect().height
+        const compactOffset = Math.max(0, (noteRect.height - compactHeight) / 2)
+        note.style.setProperty('--recipe-compact-y', `${compactOffset}px`)
+      }
       setCompactRecipeNote(shouldCompact)
     }
 
@@ -635,8 +663,14 @@ function App() {
   }
 
   const resetMochiTimer = () => {
-    setMochiDeadline(() => Date.now() + MOCHI_TIMER_MS)
-    setMochiTimeLeft(MOCHI_TIMER_MS)
+    setMochiTimerStep((currentStep) => {
+      const nextStep = Math.min(currentStep + 1, MOCHI_TIMER_DURATIONS_MS.length - 1)
+      const nextDuration = MOCHI_TIMER_DURATIONS_MS[nextStep]
+      setMochiTimerDuration(nextDuration)
+      setMochiDeadline(() => Date.now() + nextDuration)
+      setMochiTimeLeft(nextDuration)
+      return nextStep
+    })
   }
 
   const celebrateMochi = () => {
@@ -691,17 +725,63 @@ function App() {
     }, 360)
   }
 
+  const animateIngredientToMat = (ingredient: string) => {
+    const stage = stageRef.current
+    const source = ingredientRefs.current[ingredient]
+    const target = prepHitRef.current
+
+    if (!stage || !source || !target) {
+      return
+    }
+
+    const stageRect = stage.getBoundingClientRect()
+    const sourceRect = source.getBoundingClientRect()
+    const targetRect = target.getBoundingClientRect()
+    const fromX = sourceRect.left + sourceRect.width / 2 - stageRect.left
+    const fromY = sourceRect.top + sourceRect.height / 2 - stageRect.top
+    const toX = targetRect.left + targetRect.width / 2 - stageRect.left
+    const toY = targetRect.top + targetRect.height / 2 - stageRect.top
+    const deltaX = toX - fromX
+    const deltaY = toY - fromY
+    const size = Math.min(sourceRect.width, sourceRect.height) * 1.55
+
+    setIngredientFly({
+      id: ingredientFlyIdRef.current + 1,
+      image: INGREDIENT_META[ingredient].image,
+      fromX,
+      fromY,
+      midX: deltaX * 0.72,
+      midY: deltaY * 0.72 - 18,
+      deltaX,
+      deltaY,
+      size,
+    })
+    ingredientFlyIdRef.current += 1
+  }
+
   const chooseIngredient = (ingredient: string) => {
     if (catNeedsPet) {
       showInstruction('Tap Mochi to keep cooking', 'cat')
       return
     }
 
+    if (!nextIngredient) {
+      showInstruction('Ready to serve', 'good')
+      return
+    }
+
+    if (ingredient !== nextIngredient) {
+      setSelectedIngredient(null)
+      bumpIngredient(ingredient)
+      showInstruction(`Need ${nextIngredient}`, 'wrong')
+      return
+    }
+
     setSelectedIngredient(ingredient)
-    showInstruction(ingredient === nextIngredient ? `Tap mat to add ${ingredient}` : `Need ${nextIngredient}`, ingredient === nextIngredient ? 'good' : 'hint')
+    showInstruction(`Tap mat to add ${ingredient}`, 'good')
   }
 
-  const placeIngredient = (ingredient: string | null) => {
+  const placeIngredient = (ingredient: string | null, animateFromSelection = false) => {
     if (catNeedsPet) {
       showInstruction('Tap Mochi to keep cooking', 'cat')
       return
@@ -723,6 +803,10 @@ function App() {
       bumpIngredient(ingredientToPlace)
       showInstruction(`Need ${nextIngredient}`, 'wrong')
       return
+    }
+
+    if (animateFromSelection) {
+      animateIngredientToMat(ingredientToPlace)
     }
 
     const nextPlaced = [...placedIngredients, ingredientToPlace]
@@ -819,8 +903,15 @@ function App() {
     window.setTimeout(() => dragImage.remove(), 0)
 
     setDraggedIngredient(ingredient)
+
+    if (ingredient !== nextIngredient) {
+      setSelectedIngredient(null)
+      showInstruction(`Need ${nextIngredient}`, 'wrong')
+      return
+    }
+
     setSelectedIngredient(ingredient)
-    showInstruction(ingredient === nextIngredient ? `Drop ${ingredient} on mat` : `Need ${nextIngredient}`, ingredient === nextIngredient ? 'good' : 'hint')
+    showInstruction(`Drop ${ingredient} on mat`, 'good')
   }
 
   const handleDragEnd = () => {
@@ -888,6 +979,9 @@ function App() {
                 className={`layout-edit-target table-ingredient ${selected ? 'selected' : ''} ${highlighted ? 'highlighted' : ''} ${shaking ? 'shake' : ''} ${draggedIngredient === ingredient ? 'dragging' : ''}`}
                 aria-label={ingredient}
                 data-layout-label={ingredient}
+                ref={(node) => {
+                  ingredientRefs.current[ingredient] = node
+                }}
                 draggable={!editMode}
                 onPointerDown={(event) => startLayoutEdit(event, `ingredient:${ingredient}`, fallbackLayout)}
                 onClick={() => {
@@ -942,6 +1036,7 @@ function App() {
         </section>
 
         <div
+          ref={prepHitRef}
           className={`layout-edit-target prep-hit-area ${nextIngredient ? 'waiting' : 'complete'}`}
           data-testid="prep-hit-area"
           data-layout-label="Prep hit area"
@@ -953,7 +1048,7 @@ function App() {
               event.preventDefault()
               return
             }
-            placeIngredient(selectedIngredient)
+            placeIngredient(selectedIngredient, true)
           }}
           style={{
             ...getLayout('prepHit', STAGE_LAYOUT.prepHit),
@@ -963,6 +1058,26 @@ function App() {
         >
           <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'prepHit', STAGE_LAYOUT.prepHit, 'resize')} />
         </div>
+
+        {ingredientFly ? (
+          <div
+            key={ingredientFly.id}
+            className="ingredient-flyer"
+            aria-hidden="true"
+            onAnimationEnd={() => setIngredientFly(null)}
+            style={{
+              ['--fly-from-x' as string]: `${ingredientFly.fromX}px`,
+              ['--fly-from-y' as string]: `${ingredientFly.fromY}px`,
+              ['--fly-mid-x' as string]: `${ingredientFly.midX}px`,
+              ['--fly-mid-y' as string]: `${ingredientFly.midY}px`,
+              ['--fly-delta-x' as string]: `${ingredientFly.deltaX}px`,
+              ['--fly-delta-y' as string]: `${ingredientFly.deltaY}px`,
+              ['--fly-size' as string]: `${ingredientFly.size}px`,
+            }}
+          >
+            <img src={ingredientFly.image} alt="" draggable={false} />
+          </div>
+        ) : null}
 
         <div
           className="layout-edit-target prep-hint-layer"
@@ -1055,7 +1170,7 @@ function App() {
           <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'mochi', STAGE_LAYOUT.mochi, 'resize')} />
         </div>
 
-        {akariBubbleMode ? (
+        {akariBubbleMode && !creditsOpen && !conceptOpen ? (
           <div className={`akari-thought-bubble ${akariBubbleMode}`} role="status" aria-live="polite">
             {akariBubbleMode === 'cat' ? (
               <>
@@ -1163,19 +1278,18 @@ function App() {
                   PIK Composition Contest 2026
                 </a>
                 <p>
-                  Original music and character designs by{' '}
+                  <span>Original music and characters by</span>
                   <a
                     href="https://youtu.be/-HrfhpKqa1M?si=AvwrTodbaiPvLMZg"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Janelle Y
+                    Janelle Y.
                   </a>
-                  .
                 </p>
                 <p>
-                  Game design and development by{' '}
-                  <a href="mailto:binhanhpiano96@gmail.com">Le Binh Anh Nguyen</a>.
+                  <span>Game design and development by</span>
+                  <a href="mailto:binhanhpiano96@gmail.com">Le Binh Anh Nguyen</a>
                 </p>
               </div>
             </div>
