@@ -1863,6 +1863,30 @@
   }
 }
 
+@keyframes mochiFocusFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+
+  to {
+    opacity: 1;
+    backdrop-filter: blur(3px);
+  }
+}
+
+@keyframes mochiFocusLiftIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes prepActionGlow {
   from {
     filter: brightness(1);
@@ -1975,7 +1999,7 @@
 .wall-title-button {
   position: absolute;
   z-index: 2;
-  left: 34%;
+  left: 36%;
   top: 6.2%;
   width: 30%;
   padding: 0;
@@ -2350,6 +2374,19 @@
   color: #765750;
 }
 
+.game-stage .prep-copy.mochi-prompt {
+  background: rgba(244, 255, 235, 0.86);
+  box-shadow:
+    0 8px 14px rgba(93, 125, 71, 0.1),
+    inset 0 0 0 1px rgba(135, 168, 103, 0.2),
+    0 0 22px rgba(121, 179, 148, 0.28);
+  animation: prepActionGlow 980ms ease-in-out infinite alternate;
+}
+
+.game-stage .prep-copy.mochi-prompt strong {
+  color: #567344;
+}
+
 .game-stage .live-dish {
   position: relative;
   z-index: 1;
@@ -2577,7 +2614,7 @@
 .game-stage .akari-thought-bubble {
   position: absolute;
   z-index: 52;
-  left: 64.2%;
+  left: 68%;
   top: 17.6%;
   width: 18.6%;
   box-sizing: border-box;
@@ -2875,8 +2912,34 @@
   height: auto !important;
   grid-template-rows: auto auto;
   align-content: start;
-  row-gap: clamp(5px, 0.5vw, 8px);
+  row-gap: clamp(8px, 0.78vw, 13px);
+  padding-top: clamp(14px, 1.38vw, 20px);
   transform: translateY(var(--recipe-compact-y, 0px)) rotate(var(--rotation, -1.4deg));
+}
+
+.game-stage .recipe-note.compact-steps .order-hero {
+  min-height: clamp(44px, 5.2vw, 68px);
+  gap: clamp(7px, 0.62vw, 12px);
+  padding: clamp(4px, 0.36vw, 7px) clamp(4px, 0.42vw, 8px);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.game-stage .recipe-note.compact-steps .order-thumb {
+  width: clamp(38px, 4.2vw, 58px);
+  height: clamp(38px, 4.2vw, 58px);
+  border-radius: 16px;
+}
+
+.game-stage .recipe-note.compact-steps .order-hero strong {
+  font-size: clamp(0.72rem, 1.06vw, 1rem);
+  line-height: 1.02;
+}
+
+.game-stage .recipe-note.compact-steps .order-hero small {
+  margin-top: 0.24vw;
+  font-size: clamp(0.52rem, 0.74vw, 0.7rem);
+  line-height: 1.05;
 }
 
 .game-stage .recipe-note.compact-steps .recipe-checklist li {
@@ -3021,6 +3084,56 @@
   transform-origin: 50% 60%;
 }
 
+.mochi-focus-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  background: rgba(59, 41, 34, 0.48);
+  backdrop-filter: blur(3px);
+  pointer-events: auto;
+  animation: mochiFocusFadeIn 420ms ease-out both;
+}
+
+.focus-credits-toggle {
+  position: absolute;
+  z-index: 89;
+  right: 3.5%;
+  bottom: 3.4%;
+  border: 0;
+  padding: 0.58vw 0.92vw;
+  border-radius: 999px;
+  color: #70463a;
+  font-weight: 900;
+  font-size: clamp(0.64rem, 0.96vw, 0.9rem);
+  background: rgba(255, 247, 237, 0.76);
+  box-shadow:
+    0 9px 16px rgba(121, 89, 73, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.54);
+  cursor: pointer;
+  animation:
+    mochiFocusLiftIn 420ms ease-out both,
+    creditsButtonWiggle 75s ease-in-out infinite 4s;
+  transform-origin: 50% 60%;
+}
+
+.game-stage.mochi-focus-active .wall-title-button {
+  z-index: 86;
+  opacity: 0.52;
+  filter:
+    saturate(0.92)
+    sepia(0.08)
+    drop-shadow(0 0 7px rgba(255, 238, 203, 0.42))
+    drop-shadow(0 0 16px rgba(221, 151, 121, 0.24));
+}
+
+.game-stage.mochi-focus-active .mochi-layer {
+  z-index: 87 !important;
+}
+
+.game-stage.mochi-focus-active .prep-hint-layer {
+  z-index: 88 !important;
+}
+
 .credits-overlay,
 .concept-overlay {
   position: absolute;
@@ -3110,6 +3223,7 @@
   width: min(70%, 820px);
   padding: 1vw;
   border-radius: 18px;
+  overflow: hidden;
   background:
     radial-gradient(circle at 20% 12%, rgba(255, 255, 255, 0.9), transparent 28%),
     linear-gradient(180deg, rgba(255, 251, 245, 0.98), rgba(255, 237, 226, 0.96));
@@ -3124,8 +3238,43 @@
   height: auto;
   max-height: 82vh;
   object-fit: contain;
-  border-radius: 0;
+  border-radius: 14px;
   box-shadow: inset 0 0 0 1px rgba(126, 82, 70, 0.08);
+}
+
+@media (max-width: 760px) and (orientation: portrait) {
+  .credits-panel {
+    width: min(92%, 620px);
+    padding: clamp(16px, 4.4vw, 22px) clamp(18px, 5.1vw, 26px) clamp(17px, 4.7vw, 23px);
+    border-radius: 26px 28px 24px 30px;
+  }
+
+  .credits-title {
+    white-space: nowrap;
+    font-size: clamp(0.9rem, 4.15vw, 1.18rem);
+    line-height: 1;
+  }
+
+  .credits-panel p {
+    margin-top: clamp(9px, 2.6vw, 13px);
+    font-size: clamp(0.74rem, 3.25vw, 0.92rem);
+    line-height: 1.22;
+  }
+
+  .credits-panel a:not(.credits-title) {
+    font-size: 1.04em;
+  }
+
+  .concept-panel {
+    width: min(92%, 640px);
+    padding: clamp(7px, 2vw, 11px);
+    border-radius: 18px;
+  }
+
+  .concept-panel img {
+    max-height: 68vh;
+    border-radius: 12px;
+  }
 }
 
 @keyframes creditsButtonWiggle {
@@ -3493,12 +3642,32 @@
     row-gap: 1.25vw;
   }
 
+  .game-stage .recipe-note.compact-steps {
+    height: 19.5% !important;
+    row-gap: 1.25vw;
+    padding: 1.28vw 0.85vw 0.78vw;
+  }
+
   .game-stage .recipe-note .order-hero {
     gap: 0.55vw;
     margin-bottom: 0;
   }
 
+  .game-stage .recipe-note.compact-steps .order-hero {
+    min-height: 0;
+    gap: 0.55vw;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
   .game-stage .recipe-note .order-thumb {
+    width: clamp(24px, 6.5vw, 34px);
+    height: clamp(24px, 6.5vw, 34px);
+    border-radius: 12px;
+  }
+
+  .game-stage .recipe-note.compact-steps .order-thumb {
     width: clamp(24px, 6.5vw, 34px);
     height: clamp(24px, 6.5vw, 34px);
     border-radius: 12px;
@@ -3512,8 +3681,19 @@
     white-space: nowrap;
   }
 
+  .game-stage .recipe-note.compact-steps .order-hero strong {
+    font-size: clamp(0.56rem, 2vw, 0.76rem);
+    line-height: 1;
+  }
+
   .game-stage .recipe-note .order-hero small {
     font-size: clamp(0.42rem, 1.55vw, 0.56rem);
+  }
+
+  .game-stage .recipe-note.compact-steps .order-hero small {
+    margin-top: 0.12vw;
+    font-size: clamp(0.42rem, 1.55vw, 0.56rem);
+    line-height: 1.1;
   }
 
   .game-stage .recipe-note .recipe-checklist {
@@ -3525,6 +3705,10 @@
     align-items: start;
   }
 
+  .game-stage .recipe-note.compact-steps .recipe-checklist {
+    gap: 0.75vw;
+  }
+
   .game-stage .recipe-note .recipe-checklist li {
     display: grid;
     place-items: center;
@@ -3532,6 +3716,10 @@
     aspect-ratio: 1;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.46);
+  }
+
+  .game-stage .recipe-note.compact-steps .recipe-checklist li {
+    padding: 0.38vw;
   }
 
   .game-stage .recipe-note .recipe-checklist li.current {

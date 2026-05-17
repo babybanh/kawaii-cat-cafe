@@ -38,7 +38,11 @@ const LAYOUT_STORAGE_KEY = 'kawaii-cat-cafe-layout-overrides-v5'
 const BACKGROUND_MUSIC_SRC = '/assets/audio/kawaii-cat-cafe-score.mp3'
 const MUSIC_RESTART_GAP_MS = 1000
 const MOCHI_TIMER_DURATIONS_MS = [40000, 30000, 20000]
+const MOCHI_FOCUS_OVERLAY_DELAY_MS = 10000
 const MOCHI_STREAK_TARGET = 3
+const RECIPE_TEXT_MIN_WIDTH = 210
+const RECIPE_TEXT_MIN_HEIGHT = 205
+const RECIPE_TEXT_MIN_ROW_HEIGHT = 58
 const POINTS_PER_DISH = 10
 const POINTS_PER_NEEDED_PET = 14
 const POINTS_STREAK_BONUS = 6
@@ -309,6 +313,8 @@ function App() {
   const [mochiTimeLeft, setMochiTimeLeft] = useState(MOCHI_TIMER_DURATIONS_MS[0])
   const [mochiRecipeStreak, setMochiRecipeStreak] = useState(0)
   const [mochiCelebrating, setMochiCelebrating] = useState(false)
+  const [gameStarted, setGameStarted] = useState(false)
+  const [mochiFocusOverlay, setMochiFocusOverlay] = useState(false)
   const [musicEnabled, setMusicEnabled] = useState(true)
   const [musicStarted, setMusicStarted] = useState(false)
   const [creditsOpen, setCreditsOpen] = useState(false)
@@ -326,13 +332,19 @@ function App() {
   const recipe = RECIPES[recipeIndex]
   const chef = CHEFS[recipe.owner]
   const nextIngredient = recipe.ingredients[placedIngredients.length] ?? null
-  const catNeedsPet = mochiTimeLeft <= 0
+  const introActive = !gameStarted
+  const catNeedsPet = gameStarted && mochiTimeLeft <= 0
+  const modalOpen = creditsOpen || conceptOpen
+  const mochiFocusActive = (introActive || mochiFocusOverlay) && !modalOpen
+  const mochiPromptActive = introActive || catNeedsPet
   const recipeReadyToFinish = placedIngredients.length === recipe.ingredients.length
   const mochiTimerProgress = clamp(mochiTimeLeft / mochiTimerDuration, 0, 1)
   const mochiSecondsLeft = Math.max(0, Math.ceil(mochiTimeLeft / 1000))
   const akariBubbleMode = catNeedsPet ? 'cat' : recipeReadyToFinish ? 'action' : null
   const defaultPrepInstruction = catNeedsPet
     ? 'Tap Mochi to keep cooking'
+    : introActive
+      ? 'Tap Mochi to keep cooking'
     : nextIngredient
       ? selectedIngredient
         ? `Tap mat to add ${selectedIngredient}`
@@ -346,6 +358,12 @@ function App() {
       const audio = musicRef.current
 
       if (!audio || (!force && !musicEnabledRef.current)) {
+        return Promise.resolve()
+      }
+
+      if (document.hidden) {
+        audio.pause()
+        setMusicStarted(false)
         return Promise.resolve()
       }
 
@@ -367,6 +385,8 @@ function App() {
   )
   const stageDebugClasses = [
     editMode ? 'is-editing-layout' : '',
+    mochiFocusActive ? 'mochi-focus-active' : '',
+    introActive ? 'intro-active' : '',
     SHOW_LAYOUT_BOXES ? 'show-layout-boxes' : '',
     SHOW_INGREDIENT_HITBOXES ? 'show-ingredient-hitboxes' : '',
     SHOW_CHARACTER_ANCHORS ? 'show-character-anchors' : '',
@@ -407,7 +427,7 @@ function App() {
     musicRef.current = audio
 
     const handleEnded = () => {
-      if (!musicEnabledRef.current) {
+      if (!musicEnabledRef.current || document.hidden) {
         return
       }
 
@@ -438,6 +458,10 @@ function App() {
     }
 
     const keepMusicAlive = () => {
+      if (!gameStarted || document.hidden) {
+        return
+      }
+
       const audio = musicRef.current
 
       if (!audio || !audio.paused) {
@@ -454,9 +478,41 @@ function App() {
       window.removeEventListener('pointerdown', keepMusicAlive, { capture: true })
       window.removeEventListener('keydown', keepMusicAlive, { capture: true })
     }
-  }, [musicEnabled, playBackgroundMusic])
+  }, [gameStarted, musicEnabled, playBackgroundMusic])
 
   useEffect(() => {
+    const pauseMusicForBackground = (event: Event) => {
+      const appIsBackgrounded = document.hidden || document.visibilityState === 'hidden' || event.type === 'pagehide'
+
+      if (!appIsBackgrounded) {
+        return
+      }
+
+      if (musicGapTimerRef.current) {
+        window.clearTimeout(musicGapTimerRef.current)
+        musicGapTimerRef.current = null
+      }
+
+      musicRef.current?.pause()
+      setMusicStarted(false)
+    }
+
+    document.addEventListener('visibilitychange', pauseMusicForBackground)
+    window.addEventListener('pagehide', pauseMusicForBackground)
+    window.addEventListener('blur', pauseMusicForBackground)
+
+    return () => {
+      document.removeEventListener('visibilitychange', pauseMusicForBackground)
+      window.removeEventListener('pagehide', pauseMusicForBackground)
+      window.removeEventListener('blur', pauseMusicForBackground)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!gameStarted) {
+      return
+    }
+
     const timer = window.setInterval(() => {
       const nextTimeLeft = Math.max(0, mochiDeadline - Date.now())
       setMochiTimeLeft(nextTimeLeft)
@@ -466,7 +522,19 @@ function App() {
     }, 100)
 
     return () => window.clearInterval(timer)
-  }, [mochiDeadline])
+  }, [gameStarted, mochiDeadline, mochiTimerDuration])
+
+  useEffect(() => {
+    if (!catNeedsPet) {
+      return
+    }
+
+    const focusTimer = window.setTimeout(() => {
+      setMochiFocusOverlay(true)
+    }, MOCHI_FOCUS_OVERLAY_DELAY_MS)
+
+    return () => window.clearTimeout(focusTimer)
+  }, [catNeedsPet])
 
   useEffect(() => {
     const note = recipeNoteRef.current
@@ -489,8 +557,16 @@ function App() {
       const zoomedPastCompactPoint = deviceZoomRatio >= 1.3 || viewportScale >= 1.3
       const noteRect = note.getBoundingClientRect()
       const rowsDoNotFit = checklist.scrollHeight > checklist.clientHeight + 2
+      const recipeRows = Array.from(checklist.querySelectorAll<HTMLElement>('li'))
+      const shortestRowHeight = recipeRows.reduce(
+        (shortest, row) => Math.min(shortest, row.getBoundingClientRect().height),
+        Number.POSITIVE_INFINITY,
+      )
       const isPhoneLayout = window.matchMedia('(max-width: 760px)').matches
-      const cardTooSmallForText = noteRect.width < 190 || noteRect.height < 165
+      const cardTooSmallForText =
+        noteRect.width < RECIPE_TEXT_MIN_WIDTH ||
+        noteRect.height < RECIPE_TEXT_MIN_HEIGHT ||
+        shortestRowHeight < RECIPE_TEXT_MIN_ROW_HEIGHT
       const shouldCompact = isPhoneLayout || cardTooSmallForText || zoomedPastCompactPoint || rowsDoNotFit || checklist.scrollWidth > checklist.clientWidth + 2
       note.classList.toggle('compact-steps', shouldCompact)
       if (shouldCompact) {
@@ -501,12 +577,26 @@ function App() {
       setCompactRecipeNote(shouldCompact)
     }
 
-    const frame = window.requestAnimationFrame(measureRecipeNote)
-    const resizeObserver = new ResizeObserver(measureRecipeNote)
+    let frame = 0
+    const scheduleMeasureRecipeNote = () => {
+      if (frame) {
+        window.cancelAnimationFrame(frame)
+      }
+
+      frame = window.requestAnimationFrame(() => {
+        frame = 0
+        measureRecipeNote()
+      })
+    }
+
+    scheduleMeasureRecipeNote()
+    const resizeObserver = new ResizeObserver(scheduleMeasureRecipeNote)
     resizeObserver.observe(note)
 
     return () => {
-      window.cancelAnimationFrame(frame)
+      if (frame) {
+        window.cancelAnimationFrame(frame)
+      }
       resizeObserver.disconnect()
     }
   }, [recipeIndex, placedIngredients.length, catNeedsPet])
@@ -760,6 +850,11 @@ function App() {
   }
 
   const chooseIngredient = (ingredient: string) => {
+    if (introActive) {
+      showInstruction('Tap Mochi to keep cooking', 'cat')
+      return
+    }
+
     if (catNeedsPet) {
       showInstruction('Tap Mochi to keep cooking', 'cat')
       return
@@ -782,6 +877,11 @@ function App() {
   }
 
   const placeIngredient = (ingredient: string | null, animateFromSelection = false) => {
+    if (introActive) {
+      showInstruction('Tap Mochi to keep cooking', 'cat')
+      return
+    }
+
     if (catNeedsPet) {
       showInstruction('Tap Mochi to keep cooking', 'cat')
       return
@@ -823,6 +923,11 @@ function App() {
   }
 
   const finishRecipe = () => {
+    if (introActive) {
+      showInstruction('Tap Mochi to keep cooking', 'cat')
+      return
+    }
+
     if (catNeedsPet) {
       showInstruction('Tap Mochi to keep cooking', 'cat')
       return
@@ -866,9 +971,19 @@ function App() {
       void playBackgroundMusic(true)
     }
 
+    if (introActive) {
+      setGameStarted(true)
+      setMochiFocusOverlay(false)
+      setMochiDeadline(() => Date.now() + mochiTimerDuration)
+      setMochiTimeLeft(mochiTimerDuration)
+      showInstruction('Mochi purrs', 'cat')
+      return
+    }
+
     const wasWaiting = catNeedsPet
     resetMochiTimer()
     setMochiRecipeStreak(0)
+    setMochiFocusOverlay(false)
 
     if (!wasWaiting) {
       showInstruction('Mochi purrs', 'cat')
@@ -880,6 +995,12 @@ function App() {
   }
 
   const handleDragStart = (event: DragEvent<HTMLButtonElement>, ingredient: string) => {
+    if (introActive) {
+      event.preventDefault()
+      showInstruction('Tap Mochi to keep cooking', 'cat')
+      return
+    }
+
     if (catNeedsPet) {
       event.preventDefault()
       showInstruction('Tap Mochi to keep cooking', 'cat')
@@ -1089,7 +1210,7 @@ function App() {
             ['--rotation' as string]: `${getLayout('prepHint', STAGE_LAYOUT.prepHint).rotation ?? '0'}deg`,
           }}
         >
-          <div className={`prep-copy ${instructionTone}`}>
+          <div className={`prep-copy ${mochiPromptActive ? 'cat mochi-prompt' : instructionTone}`}>
             {recipeReadyToFinish && !catNeedsPet ? (
               <button
                 type="button"
@@ -1142,7 +1263,7 @@ function App() {
         </button>
 
         <div
-          className={`layout-edit-target mochi-layer ${catNeedsPet ? 'needs-pet' : ''} ${mochiCelebrating ? 'celebrating' : ''}`}
+          className={`layout-edit-target mochi-layer ${mochiPromptActive ? 'needs-pet' : ''} ${mochiCelebrating ? 'celebrating' : ''}`}
           data-layout-label="Mochi"
           onPointerDown={(event) => startLayoutEdit(event, 'mochi', STAGE_LAYOUT.mochi)}
           style={{
@@ -1156,7 +1277,7 @@ function App() {
             type="button"
             aria-label="Mochi"
             data-testid="mochi-button"
-            className={`cat-button ${catNeedsPet ? 'active' : ''}`}
+            className={`cat-button ${mochiPromptActive ? 'active' : ''}`}
             onClick={() => {
               if (!editMode) {
                 petCat()
@@ -1164,11 +1285,20 @@ function App() {
             }}
           >
             <img src="/assets/characters/mochi.png" alt="Mochi" className="cat-art" />
-            {catNeedsPet ? <span className="cat-bubble">pet?</span> : null}
+            {mochiPromptActive ? <span className="cat-bubble">pet?</span> : null}
           </button>
           {mochiCelebrating ? <div className="mochi-heart-burst" aria-hidden="true">♥</div> : null}
           <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'mochi', STAGE_LAYOUT.mochi, 'resize')} />
         </div>
+
+        {mochiFocusActive ? (
+          <>
+            <div className="mochi-focus-scrim" aria-hidden="true" />
+            <button type="button" className="focus-credits-toggle" onClick={() => setCreditsOpen(true)}>
+              Credits
+            </button>
+          </>
+        ) : null}
 
         {akariBubbleMode && !creditsOpen && !conceptOpen ? (
           <div className={`akari-thought-bubble ${akariBubbleMode}`} role="status" aria-live="polite">
@@ -1263,8 +1393,14 @@ function App() {
           </div>
 
           {creditsOpen ? (
-            <div className="credits-overlay" role="dialog" aria-modal="true" aria-labelledby="credits-title">
-              <div className="credits-panel">
+            <div
+              className="credits-overlay"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="credits-title"
+              onClick={() => setCreditsOpen(false)}
+            >
+              <div className="credits-panel" onClick={(event) => event.stopPropagation()}>
                 <button type="button" className="credits-close" aria-label="Close credits" onClick={() => setCreditsOpen(false)}>
                   x
                 </button>
@@ -1296,8 +1432,14 @@ function App() {
           ) : null}
 
           {conceptOpen ? (
-            <div className="concept-overlay" role="dialog" aria-modal="true" aria-label="Original game concept artwork">
-              <div className="concept-panel">
+            <div
+              className="concept-overlay"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Original game concept artwork"
+              onClick={() => setConceptOpen(false)}
+            >
+              <div className="concept-panel" onClick={(event) => event.stopPropagation()}>
                 <button type="button" className="credits-close" aria-label="Close concept art" onClick={() => setConceptOpen(false)}>
                   x
                 </button>
