@@ -889,9 +889,9 @@
   user-select: none;
   -webkit-user-select: none;
   border-radius: 32px;
-  background-image: url('/assets/backgrounds/kawaii-bakery-table.png');
-  background-size: cover;
-  background-position: center;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(255, 248, 226, 0.72), transparent 42%),
+    linear-gradient(180deg, #ffe9db 0%, #e6b889 100%);
   box-shadow:
     0 30px 70px rgba(126, 84, 57, 0.22),
     0 0 0 8px rgba(255, 255, 255, 0.3);
@@ -1352,7 +1352,9 @@
 
 /* Clean stage v2: low-chrome play table with draggable sticker ingredients. */
 .game-stage {
-  background-image: url('/assets/backgrounds/kawaii-bakery-clean-stage.png');
+  background:
+    radial-gradient(circle at 50% 28%, rgba(255, 248, 226, 0.72), transparent 42%),
+    linear-gradient(180deg, #ffe9db 0%, #e6b889 100%);
 }
 
 .game-stage .recipe-shell {
@@ -3122,6 +3124,19 @@
   animation: creditsButtonWiggle 75s ease-in-out infinite;
   animation-delay: 4s;
   transform-origin: 50% 60%;
+}
+
+.game-stage.assets-loading .layout-editor {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.game-stage.assets-loading .cat-button {
+  cursor: wait;
+}
+
+.game-stage.assets-loading .cat-button:disabled {
+  opacity: 1;
 }
 
 .mochi-focus-scrim {

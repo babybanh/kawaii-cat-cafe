@@ -41,6 +41,8 @@ const MOCHI_TIMER_DURATIONS_MS = [40000, 30000, 20000]
 const MOCHI_FOCUS_OVERLAY_DELAYS_MS = [5000, 7000, 10000]
 const MOCHI_STREAK_TARGET = 3
 const INGREDIENT_NUDGE_DELAY_MS = 5000
+const CHARACTER_ASSET_LOAD_TIMEOUT_MS = 6000
+const CRITICAL_ASSET_LOAD_TIMEOUT_MS = 9000
 const RECIPE_TEXT_MIN_WIDTH = 210
 const RECIPE_TEXT_MIN_HEIGHT = 205
 const RECIPE_TEXT_MIN_ROW_HEIGHT = 58
@@ -285,6 +287,41 @@ const RECIPE_LAYER_ASSETS: Partial<Record<RecipeId, Record<string, string>>> = {
   },
 }
 
+const MOCHI_IMAGE_SRC = '/assets/characters/mochi.png'
+
+const STAGE_IMAGE_ASSETS = [
+  '/assets/backgrounds/kawaii-room-layer.png',
+  '/assets/backgrounds/kawaii-table-foreground.png',
+  '/assets/backgrounds/gametitle.png',
+]
+
+const STAGE_BACKGROUND_IMAGE_ASSETS = STAGE_IMAGE_ASSETS.slice(0, 2)
+
+const LOADING_SCREEN_IMAGE_ASSETS = uniqueStrings([
+  ...STAGE_BACKGROUND_IMAGE_ASSETS,
+  MOCHI_IMAGE_SRC,
+])
+
+const CHEF_CHARACTER_IMAGE_ASSETS = uniqueStrings([
+  CHEFS.yuto.image,
+  CHEFS.akari.image,
+])
+
+const CONCEPT_ART_SRC = '/assets/backgrounds/gameconcept.jpeg'
+const FIRST_RECIPE = RECIPES[0]
+
+const CRITICAL_IMAGE_ASSETS = uniqueStrings([
+  ...STAGE_IMAGE_ASSETS,
+  ...ALL_INGREDIENTS.map((ingredient) => INGREDIENT_META[ingredient].image),
+  ...getRecipeLayerSources(FIRST_RECIPE),
+  getRecipeThumbnail(FIRST_RECIPE),
+])
+
+const DEFERRED_IMAGE_ASSETS = uniqueStrings([
+  CONCEPT_ART_SRC,
+  ...RECIPES.slice(1).flatMap((recipe) => [...getRecipeLayerSources(recipe), getRecipeThumbnail(recipe)]),
+])
+
 function App() {
   const stageRef = useRef<HTMLElement | null>(null)
   const recipeNoteRef = useRef<HTMLElement | null>(null)
@@ -317,6 +354,9 @@ function App() {
   const [mochiTimeLeft, setMochiTimeLeft] = useState(MOCHI_TIMER_DURATIONS_MS[0])
   const [mochiRecipeStreak, setMochiRecipeStreak] = useState(0)
   const [mochiCelebrating, setMochiCelebrating] = useState(false)
+  const [mochiReady, setMochiReady] = useState(false)
+  const [charactersReady, setCharactersReady] = useState(false)
+  const [criticalAssetsReady, setCriticalAssetsReady] = useState(false)
   const [gameStarted, setGameStarted] = useState(false)
   const [mochiFocusOverlay, setMochiFocusOverlay] = useState(false)
   const [musicEnabled, setMusicEnabled] = useState(true)
@@ -337,16 +377,21 @@ function App() {
   const recipe = RECIPES[recipeIndex]
   const chef = CHEFS[recipe.owner]
   const nextIngredient = recipe.ingredients[placedIngredients.length] ?? null
-  const introActive = !gameStarted
-  const catNeedsPet = gameStarted && mochiTimeLeft <= 0
+  const loadingActive = !criticalAssetsReady
+  const introActive = criticalAssetsReady && !gameStarted
+  const catNeedsPet = criticalAssetsReady && gameStarted && mochiTimeLeft <= 0
   const modalOpen = creditsOpen || conceptOpen
-  const mochiFocusActive = (introActive || mochiFocusOverlay) && !modalOpen
-  const mochiPromptActive = introActive || catNeedsPet
+  const mochiFocusActive = (loadingActive || introActive || mochiFocusOverlay) && !modalOpen
+  const focusControlsVisible = mochiFocusActive && !loadingActive
+  const mochiPromptActive = !loadingActive && (introActive || catNeedsPet)
+  const loadingPromptActive = loadingActive || mochiPromptActive
   const recipeReadyToFinish = placedIngredients.length === recipe.ingredients.length
   const mochiTimerProgress = clamp(mochiTimeLeft / mochiTimerDuration, 0, 1)
   const mochiSecondsLeft = Math.max(0, Math.ceil(mochiTimeLeft / 1000))
   const akariBubbleMode = catNeedsPet ? 'cat' : recipeReadyToFinish ? 'action' : null
-  const defaultPrepInstruction = catNeedsPet
+  const defaultPrepInstruction = loadingActive
+    ? 'loading...'
+    : catNeedsPet
     ? 'Tap Mochi to keep cooking'
     : introActive
       ? 'Tap Mochi to keep cooking'
@@ -360,7 +405,35 @@ function App() {
   const mobilePrepInstruction = instructionMessage ?? defaultPrepInstruction
   const playBackgroundMusic = useCallback(
     (force = false) => {
-      const audio = musicRef.current
+      let audio = musicRef.current
+
+      if (!audio) {
+        const backgroundAudio = new Audio(BACKGROUND_MUSIC_SRC)
+        backgroundAudio.preload = 'none'
+        backgroundAudio.volume = 0.42
+        backgroundAudio.addEventListener('ended', () => {
+          if (!musicEnabledRef.current || document.hidden) {
+            return
+          }
+
+          if (musicGapTimerRef.current) {
+            window.clearTimeout(musicGapTimerRef.current)
+          }
+
+          musicGapTimerRef.current = window.setTimeout(() => {
+            void backgroundAudio
+              .play()
+              .then(() => {
+                setMusicStarted(true)
+              })
+              .catch(() => {
+                setMusicStarted(false)
+            })
+          }, MUSIC_RESTART_GAP_MS)
+        })
+        musicRef.current = backgroundAudio
+        audio = backgroundAudio
+      }
 
       if (!audio || (!force && !musicEnabledRef.current)) {
         return Promise.resolve()
@@ -391,6 +464,7 @@ function App() {
   const stageDebugClasses = [
     editMode ? 'is-editing-layout' : '',
     mochiFocusActive ? 'mochi-focus-active' : '',
+    loadingActive ? 'assets-loading' : '',
     introActive ? 'intro-active' : '',
     SHOW_LAYOUT_BOXES ? 'show-layout-boxes' : '',
     SHOW_INGREDIENT_HITBOXES ? 'show-ingredient-hitboxes' : '',
@@ -429,33 +503,39 @@ function App() {
   )
 
   useEffect(() => {
-    const audio = new Audio(BACKGROUND_MUSIC_SRC)
-    audio.preload = 'auto'
-    audio.volume = 0.42
-    musicRef.current = audio
+    let active = true
 
-    const handleEnded = () => {
-      if (!musicEnabledRef.current || document.hidden) {
+    void preloadImages(LOADING_SCREEN_IMAGE_ASSETS, CHARACTER_ASSET_LOAD_TIMEOUT_MS).then(() => {
+      if (!active) {
         return
       }
 
-      if (musicGapTimerRef.current) {
-        window.clearTimeout(musicGapTimerRef.current)
-      }
+      setMochiReady(true)
 
-      musicGapTimerRef.current = window.setTimeout(() => {
-        void playBackgroundMusic()
-      }, MUSIC_RESTART_GAP_MS)
-    }
+      void preloadImages(CHEF_CHARACTER_IMAGE_ASSETS, CHARACTER_ASSET_LOAD_TIMEOUT_MS).then(() => {
+        if (!active) {
+          return
+        }
 
-    audio.addEventListener('ended', handleEnded)
+        setCharactersReady(true)
+
+        void preloadImages(CRITICAL_IMAGE_ASSETS, CRITICAL_ASSET_LOAD_TIMEOUT_MS).then(() => {
+          if (!active) {
+            return
+          }
+
+          setCriticalAssetsReady(true)
+          scheduleDeferredImagePreload(DEFERRED_IMAGE_ASSETS)
+        })
+      })
+    })
 
     return () => {
-      audio.pause()
-      audio.removeEventListener('ended', handleEnded)
+      active = false
+      musicRef.current?.pause()
       musicRef.current = null
     }
-  }, [playBackgroundMusic])
+  }, [])
 
   useEffect(() => {
     musicEnabledRef.current = musicEnabled
@@ -630,7 +710,7 @@ function App() {
       }
       resizeObserver.disconnect()
     }
-  }, [recipeIndex, placedIngredients.length, catNeedsPet])
+  }, [recipeIndex, placedIngredients.length, catNeedsPet, mochiReady])
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -886,6 +966,11 @@ function App() {
   }
 
   const chooseIngredient = (ingredient: string) => {
+    if (loadingActive) {
+      showInstruction('loading...', 'cat')
+      return
+    }
+
     if (introActive) {
       showInstruction('Tap Mochi to keep cooking', 'cat')
       return
@@ -915,6 +1000,11 @@ function App() {
   }
 
   const placeIngredient = (ingredient: string | null, animateFromSelection = false) => {
+    if (loadingActive) {
+      showInstruction('loading...', 'cat')
+      return
+    }
+
     if (introActive) {
       showInstruction('Tap Mochi to keep cooking', 'cat')
       return
@@ -963,6 +1053,11 @@ function App() {
   }
 
   const finishRecipe = () => {
+    if (loadingActive) {
+      showInstruction('loading...', 'cat')
+      return
+    }
+
     if (introActive) {
       showInstruction('Tap Mochi to keep cooking', 'cat')
       return
@@ -1007,6 +1102,10 @@ function App() {
   }
 
   const petCat = () => {
+    if (loadingActive) {
+      return
+    }
+
     if (musicEnabledRef.current) {
       void playBackgroundMusic(true)
     }
@@ -1039,6 +1138,12 @@ function App() {
   }
 
   const handleDragStart = (event: DragEvent<HTMLButtonElement>, ingredient: string) => {
+    if (loadingActive) {
+      event.preventDefault()
+      showInstruction('loading...', 'cat')
+      return
+    }
+
     if (introActive) {
       event.preventDefault()
       showInstruction('Tap Mochi to keep cooking', 'cat')
@@ -1093,38 +1198,42 @@ function App() {
     <div className="play-shell">
       <main ref={stageRef} className={`game-stage ${stageDebugClasses}`} aria-label="Kawaii Cat Cafe cooking stage">
         <img src="/assets/backgrounds/kawaii-room-layer.png" alt="" className="stage-layer room-layer" draggable={false} />
-        <button
-          type="button"
-          className="wall-title-button"
-          aria-label="Open original game concept artwork"
-          onClick={() => setConceptOpen(true)}
-        >
-          <img src="/assets/backgrounds/gametitle.png" alt="" draggable={false} />
-        </button>
+        {!loadingActive ? (
+          <button
+            type="button"
+            className="wall-title-button"
+            aria-label="Open original game concept artwork"
+            onClick={() => setConceptOpen(true)}
+          >
+            <img src="/assets/backgrounds/gametitle.png" alt="" draggable={false} />
+          </button>
+        ) : null}
 
-        <div className="characters-layer" aria-label="Cafe helpers">
-          {Object.values(CHEFS).map((person) => (
-            <div
-              key={person.name}
-              className={`layout-edit-target character-sticker ${chef.name === person.name ? 'active' : 'inactive'} ${person.name.toLowerCase()}-character`}
-              data-layout-label={person.name}
-              onPointerDown={(event) => startLayoutEdit(event, person.name.toLowerCase(), STAGE_LAYOUT[person.name.toLowerCase()])}
-              style={{
-                ...getLayout(person.name.toLowerCase(), STAGE_LAYOUT[person.name.toLowerCase()]),
-                ['--chef-accent' as string]: person.accent,
-                ['--image-scale' as string]: getLayout(person.name.toLowerCase(), STAGE_LAYOUT[person.name.toLowerCase()]).imageScale ?? '1',
-                ['--rotation' as string]: `${getLayout(person.name.toLowerCase(), STAGE_LAYOUT[person.name.toLowerCase()]).rotation ?? '0'}deg`,
-              }}
-            >
-              <img src={person.image} alt={person.name} />
-              <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, person.name.toLowerCase(), STAGE_LAYOUT[person.name.toLowerCase()], 'resize')} />
-            </div>
-          ))}
-        </div>
+        {charactersReady ? (
+          <div className="characters-layer" aria-label="Cafe helpers">
+            {Object.values(CHEFS).map((person) => (
+              <div
+                key={person.name}
+                className={`layout-edit-target character-sticker ${chef.name === person.name ? 'active' : 'inactive'} ${person.name.toLowerCase()}-character`}
+                data-layout-label={person.name}
+                onPointerDown={(event) => startLayoutEdit(event, person.name.toLowerCase(), STAGE_LAYOUT[person.name.toLowerCase()])}
+                style={{
+                  ...getLayout(person.name.toLowerCase(), STAGE_LAYOUT[person.name.toLowerCase()]),
+                  ['--chef-accent' as string]: person.accent,
+                  ['--image-scale' as string]: getLayout(person.name.toLowerCase(), STAGE_LAYOUT[person.name.toLowerCase()]).imageScale ?? '1',
+                  ['--rotation' as string]: `${getLayout(person.name.toLowerCase(), STAGE_LAYOUT[person.name.toLowerCase()]).rotation ?? '0'}deg`,
+                }}
+              >
+                <img src={person.image} alt={person.name} />
+                <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, person.name.toLowerCase(), STAGE_LAYOUT[person.name.toLowerCase()], 'resize')} />
+              </div>
+            ))}
+          </div>
+        ) : null}
 
         <img src="/assets/backgrounds/kawaii-table-foreground.png" alt="" className="stage-layer table-layer" draggable={false} />
 
-        <section className="ingredients-layer" aria-label="Ingredient table">
+        {mochiReady ? <section className="ingredients-layer" aria-label="Ingredient table">
           {ALL_INGREDIENTS.map((ingredient) => {
             const meta = INGREDIENT_META[ingredient]
             const fallbackLayout = INGREDIENT_LAYOUT[ingredient]
@@ -1179,7 +1288,7 @@ function App() {
               </button>
             )
           })}
-        </section>
+        </section> : null}
 
         <section
           className="layout-edit-target prep-layer"
@@ -1196,7 +1305,7 @@ function App() {
             <div className="sparkle sparkle-a">✦</div>
             <div className="sparkle sparkle-b">✦</div>
             <div className="sparkle sparkle-c">✦</div>
-            <LiveDish recipe={recipe} placedIngredients={placedIngredients} />
+            {mochiReady ? <LiveDish recipe={recipe} placedIngredients={placedIngredients} /> : null}
           </div>
           <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'prep', STAGE_LAYOUT.prep, 'resize')} />
         </section>
@@ -1245,7 +1354,7 @@ function App() {
           </div>
         ) : null}
 
-        <div
+        {mochiReady ? <div
           className="layout-edit-target prep-hint-layer"
           data-layout-label="Prep hint"
           onPointerDown={(event) => startLayoutEdit(event, 'prepHint', STAGE_LAYOUT.prepHint)}
@@ -1255,7 +1364,7 @@ function App() {
             ['--rotation' as string]: `${getLayout('prepHint', STAGE_LAYOUT.prepHint).rotation ?? '0'}deg`,
           }}
         >
-          <div className={`prep-copy ${mochiPromptActive ? 'cat mochi-prompt' : instructionTone}`}>
+          <div className={`prep-copy ${loadingPromptActive ? 'cat mochi-prompt' : instructionTone}`}>
             {recipeReadyToFinish && !catNeedsPet ? (
               <button
                 type="button"
@@ -1280,9 +1389,9 @@ function App() {
             )}
           </div>
           <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'prepHint', STAGE_LAYOUT.prepHint, 'resize')} />
-        </div>
+        </div> : null}
 
-        <button
+        {mochiReady ? <button
           type="button"
           className={`layout-edit-target finish-action ${recipeReadyToFinish ? 'ready' : 'not-ready'}`}
           data-testid="finish-button"
@@ -1305,10 +1414,10 @@ function App() {
           <img src={getRecipeThumbnail(recipe)} alt="" />
           <strong>{recipe.finishLabel}</strong>
           <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'finishButton', STAGE_LAYOUT.finishButton, 'resize')} />
-        </button>
+        </button> : null}
 
-        <div
-          className={`layout-edit-target mochi-layer ${mochiPromptActive ? 'needs-pet' : ''} ${mochiCelebrating ? 'celebrating' : ''}`}
+        {mochiReady ? <div
+          className={`layout-edit-target mochi-layer ${loadingPromptActive ? 'needs-pet' : ''} ${mochiCelebrating ? 'celebrating' : ''}`}
           data-layout-label="Mochi"
           onPointerDown={(event) => startLayoutEdit(event, 'mochi', STAGE_LAYOUT.mochi)}
           style={{
@@ -1322,26 +1431,29 @@ function App() {
             type="button"
             aria-label="Mochi"
             data-testid="mochi-button"
-            className={`cat-button ${mochiPromptActive ? 'active' : ''}`}
+            className={`cat-button ${loadingPromptActive ? 'active' : ''}`}
+            disabled={loadingActive}
             onClick={() => {
               if (!editMode) {
                 petCat()
               }
             }}
           >
-            <img src="/assets/characters/mochi.png" alt="Mochi" className="cat-art" />
+            <img src={MOCHI_IMAGE_SRC} alt="Mochi" className="cat-art" />
             {mochiPromptActive ? <span className="cat-bubble">pet?</span> : null}
           </button>
           {mochiCelebrating ? <div className="mochi-heart-burst" aria-hidden="true">♥</div> : null}
           <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'mochi', STAGE_LAYOUT.mochi, 'resize')} />
-        </div>
+        </div> : null}
 
         {mochiFocusActive ? (
           <>
             <div className="mochi-focus-scrim" aria-hidden="true" />
-            <button type="button" className="focus-credits-toggle" onClick={() => setCreditsOpen(true)}>
-              Credits
-            </button>
+            {focusControlsVisible ? (
+              <button type="button" className="focus-credits-toggle" onClick={() => setCreditsOpen(true)}>
+                Credits
+              </button>
+            ) : null}
           </>
         ) : null}
 
@@ -1369,7 +1481,7 @@ function App() {
             <span>Points: {score}</span>
           </div>
 
-          <article
+          {mochiReady ? <article
             ref={recipeNoteRef}
             className={`layout-edit-target recipe-note ${catNeedsPet ? 'pet-needed' : ''} ${compactRecipeNote ? 'compact-steps' : ''}`}
             data-layout-label="Recipe note"
@@ -1419,7 +1531,7 @@ function App() {
               })}
             </ol>
             <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'recipe', STAGE_LAYOUT.recipe, 'resize')} />
-          </article>
+          </article> : null}
 
           <div className={`layout-editor ${editMode ? 'open' : ''}`}>
             <button type="button" className="music-toggle" onClick={toggleMusic} aria-pressed={musicEnabled}>
@@ -1723,6 +1835,78 @@ function getRecipeThumbnail(recipe: Recipe) {
   const finalIngredient = recipe.ingredients[recipe.ingredients.length - 1]
 
   return assetLayers?.[finalIngredient] ?? INGREDIENT_META[recipe.ingredients[0]].image
+}
+
+function getRecipeLayerSources(recipe: Recipe) {
+  const assetLayers = RECIPE_LAYER_ASSETS[recipe.id]
+
+  if (!assetLayers) {
+    return []
+  }
+
+  return recipe.ingredients.map((ingredient) => assetLayers[ingredient]).filter(Boolean)
+}
+
+function uniqueStrings(values: string[]) {
+  return Array.from(new Set(values))
+}
+
+function preloadImages(sources: string[], timeoutMs = 0) {
+  const loadAll = Promise.allSettled(sources.map(preloadImage)).then(() => undefined)
+
+  if (timeoutMs <= 0) {
+    return loadAll
+  }
+
+  return Promise.race([
+    loadAll,
+    new Promise<void>((resolve) => {
+      window.setTimeout(resolve, timeoutMs)
+    }),
+  ])
+}
+
+function preloadImage(source: string) {
+  return new Promise<void>((resolve) => {
+    const image = new Image()
+    const finish = () => resolve()
+
+    image.decoding = 'async'
+    image.onload = () => {
+      if (typeof image.decode !== 'function') {
+        finish()
+        return
+      }
+
+      void image.decode().then(finish).catch(finish)
+    }
+    image.onerror = finish
+    image.src = source
+
+    if (image.complete) {
+      finish()
+    }
+  })
+}
+
+function scheduleDeferredImagePreload(sources: string[]) {
+  if (sources.length === 0 || typeof window === 'undefined') {
+    return
+  }
+
+  const preload = () => {
+    void preloadImages(sources)
+  }
+  const idleWindow = window as Window & {
+    requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number
+  }
+
+  if (idleWindow.requestIdleCallback) {
+    idleWindow.requestIdleCallback(preload, { timeout: 4000 })
+    return
+  }
+
+  window.setTimeout(preload, 800)
 }
 
 function loadBestScore() {
