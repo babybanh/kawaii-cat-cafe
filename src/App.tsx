@@ -38,11 +38,13 @@ const LAYOUT_STORAGE_KEY = 'kawaii-cat-cafe-layout-overrides-v5'
 const BACKGROUND_MUSIC_SRC = '/assets/audio/kawaii-cat-cafe-score.mp3'
 const MUSIC_RESTART_GAP_MS = 1000
 const MOCHI_TIMER_DURATIONS_MS = [40000, 30000, 20000]
-const MOCHI_FOCUS_OVERLAY_DELAY_MS = 10000
+const MOCHI_FOCUS_OVERLAY_DELAYS_MS = [5000, 7000, 10000]
 const MOCHI_STREAK_TARGET = 3
+const INGREDIENT_NUDGE_DELAY_MS = 5000
 const RECIPE_TEXT_MIN_WIDTH = 210
 const RECIPE_TEXT_MIN_HEIGHT = 205
 const RECIPE_TEXT_MIN_ROW_HEIGHT = 58
+const RECIPE_EXTREME_ZOOM_RATIO = 1.75
 const POINTS_PER_DISH = 10
 const POINTS_PER_NEEDED_PET = 14
 const POINTS_STREAK_BONUS = 6
@@ -96,7 +98,7 @@ const STAGE_LAYOUT: Record<string, IngredientLayout> = {
   prepHint: { left: '38.8%', top: '73.7%', width: '20.3%', height: '4.7%', imageScale: '1', rotation: '0', zIndex: 1 },
   finishButton: { left: '43%', top: '73.4%', width: '12.4%', height: '4.8%', imageScale: '1', rotation: '0', zIndex: 1 },
   mochi: { left: '39.9%', top: '84%', width: '18.4%', height: '12.5%', imageScale: '1.5', rotation: '0', zIndex: 1 },
-  recipe: { left: '7.6%', top: '12.7%', width: '21.8%', height: '20.4%', imageScale: '1', rotation: '-5', zIndex: 1 },
+  recipe: { left: '7.4%', top: '12.7%', width: '23.4%', height: '20.4%', imageScale: '1', rotation: '-5', zIndex: 1 },
   yuto: { left: '21.5%', top: '17.1%', width: '46.6%', height: '50.3%', imageScale: '1', rotation: '0', zIndex: 1 },
   akari: { left: '44.3%', top: '1.2%', width: '40.1%', height: '70%', imageScale: '1', rotation: '0', zIndex: 1 },
 }
@@ -307,7 +309,9 @@ function App() {
   const [instructionMessage, setInstructionMessage] = useState<string | null>(null)
   const [instructionTone, setInstructionTone] = useState<'good' | 'wrong' | 'cat' | 'hint'>('hint')
   const [shakeIngredient, setShakeIngredient] = useState<string | null>(null)
-  const [, setMochiTimerStep] = useState(0)
+  const [nudgedIngredient, setNudgedIngredient] = useState<string | null>(null)
+  const [ingredientNudgeToken, setIngredientNudgeToken] = useState(0)
+  const [mochiTimerStep, setMochiTimerStep] = useState(0)
   const [mochiTimerDuration, setMochiTimerDuration] = useState(MOCHI_TIMER_DURATIONS_MS[0])
   const [mochiDeadline, setMochiDeadline] = useState(() => Date.now() + MOCHI_TIMER_DURATIONS_MS[0])
   const [mochiTimeLeft, setMochiTimeLeft] = useState(MOCHI_TIMER_DURATIONS_MS[0])
@@ -327,6 +331,7 @@ function App() {
   const toastTimerRef = useRef<number | null>(null)
   const instructionTimerRef = useRef<number | null>(null)
   const shakeTimerRef = useRef<number | null>(null)
+  const ingredientNudgeTimerRef = useRef<number | null>(null)
   const mochiCelebrateTimerRef = useRef<number | null>(null)
 
   const recipe = RECIPES[recipeIndex]
@@ -409,6 +414,9 @@ function App() {
       }
       if (shakeTimerRef.current) {
         window.clearTimeout(shakeTimerRef.current)
+      }
+      if (ingredientNudgeTimerRef.current) {
+        window.clearTimeout(ingredientNudgeTimerRef.current)
       }
       if (musicGapTimerRef.current) {
         window.clearTimeout(musicGapTimerRef.current)
@@ -531,10 +539,33 @@ function App() {
 
     const focusTimer = window.setTimeout(() => {
       setMochiFocusOverlay(true)
-    }, MOCHI_FOCUS_OVERLAY_DELAY_MS)
+    }, MOCHI_FOCUS_OVERLAY_DELAYS_MS[mochiTimerStep] ?? MOCHI_FOCUS_OVERLAY_DELAYS_MS[MOCHI_FOCUS_OVERLAY_DELAYS_MS.length - 1])
 
     return () => window.clearTimeout(focusTimer)
-  }, [catNeedsPet])
+  }, [catNeedsPet, mochiTimerStep])
+
+  useEffect(() => {
+    if (ingredientNudgeTimerRef.current) {
+      window.clearTimeout(ingredientNudgeTimerRef.current)
+      ingredientNudgeTimerRef.current = null
+    }
+
+    if (!gameStarted || catNeedsPet || !nextIngredient || selectedIngredient) {
+      return
+    }
+
+    ingredientNudgeTimerRef.current = window.setTimeout(() => {
+      setNudgedIngredient(nextIngredient)
+      ingredientNudgeTimerRef.current = null
+    }, INGREDIENT_NUDGE_DELAY_MS)
+
+    return () => {
+      if (ingredientNudgeTimerRef.current) {
+        window.clearTimeout(ingredientNudgeTimerRef.current)
+        ingredientNudgeTimerRef.current = null
+      }
+    }
+  }, [catNeedsPet, gameStarted, ingredientNudgeToken, nextIngredient, selectedIngredient])
 
   useEffect(() => {
     const note = recipeNoteRef.current
@@ -554,7 +585,7 @@ function App() {
       note.style.setProperty('--recipe-compact-y', '0px')
       const viewportScale = window.visualViewport?.scale ?? 1
       const deviceZoomRatio = (window.devicePixelRatio || 1) / initialDevicePixelRatioRef.current
-      const zoomedPastCompactPoint = deviceZoomRatio >= 1.3 || viewportScale >= 1.3
+      const zoomedPastCompactPoint = deviceZoomRatio >= RECIPE_EXTREME_ZOOM_RATIO || viewportScale >= RECIPE_EXTREME_ZOOM_RATIO
       const noteRect = note.getBoundingClientRect()
       const rowsDoNotFit = checklist.scrollHeight > checklist.clientHeight + 2
       const recipeRows = Array.from(checklist.querySelectorAll<HTMLElement>('li'))
@@ -562,12 +593,12 @@ function App() {
         (shortest, row) => Math.min(shortest, row.getBoundingClientRect().height),
         Number.POSITIVE_INFINITY,
       )
-      const isPhoneLayout = window.matchMedia('(max-width: 760px)').matches
+      const isPortraitPhoneLayout = window.matchMedia('(max-width: 760px) and (orientation: portrait)').matches
       const cardTooSmallForText =
         noteRect.width < RECIPE_TEXT_MIN_WIDTH ||
         noteRect.height < RECIPE_TEXT_MIN_HEIGHT ||
-        shortestRowHeight < RECIPE_TEXT_MIN_ROW_HEIGHT
-      const shouldCompact = isPhoneLayout || cardTooSmallForText || zoomedPastCompactPoint || rowsDoNotFit || checklist.scrollWidth > checklist.clientWidth + 2
+        (isPortraitPhoneLayout && shortestRowHeight < RECIPE_TEXT_MIN_ROW_HEIGHT)
+      const shouldCompact = isPortraitPhoneLayout || cardTooSmallForText || zoomedPastCompactPoint || rowsDoNotFit || checklist.scrollWidth > checklist.clientWidth + 2
       note.classList.toggle('compact-steps', shouldCompact)
       if (shouldCompact) {
         const compactHeight = note.getBoundingClientRect().height
@@ -798,6 +829,11 @@ function App() {
     }, duration)
   }
 
+  const restartIngredientNudge = () => {
+    setNudgedIngredient(null)
+    setIngredientNudgeToken((token) => token + 1)
+  }
+
   const addScore = (points: number) => {
     const nextScore = score + points
     setScore(nextScore)
@@ -865,6 +901,8 @@ function App() {
       return
     }
 
+    restartIngredientNudge()
+
     if (ingredient !== nextIngredient) {
       setSelectedIngredient(null)
       bumpIngredient(ingredient)
@@ -891,6 +929,8 @@ function App() {
       showInstruction('Ready to serve', 'good')
       return
     }
+
+    restartIngredientNudge()
 
     const ingredientToPlace = ingredient ?? selectedIngredient
 
@@ -976,19 +1016,23 @@ function App() {
       setMochiFocusOverlay(false)
       setMochiDeadline(() => Date.now() + mochiTimerDuration)
       setMochiTimeLeft(mochiTimerDuration)
+      restartIngredientNudge()
       showInstruction('Mochi purrs', 'cat')
       return
     }
 
     const wasWaiting = catNeedsPet
-    resetMochiTimer()
-    setMochiRecipeStreak(0)
-    setMochiFocusOverlay(false)
 
     if (!wasWaiting) {
+      setMochiFocusOverlay(false)
       showInstruction('Mochi purrs', 'cat')
       return
     }
+
+    resetMochiTimer()
+    setMochiRecipeStreak(0)
+    setMochiFocusOverlay(false)
+    restartIngredientNudge()
 
     addScore(POINTS_PER_NEEDED_PET)
     showInstruction(`Mochi is happy +${POINTS_PER_NEEDED_PET}`, 'cat')
@@ -1088,6 +1132,7 @@ function App() {
             const selected = selectedIngredient === ingredient
             const highlighted = nextIngredient === ingredient
             const shaking = shakeIngredient === ingredient
+            const nudged = nudgedIngredient === ingredient && highlighted && gameStarted && !catNeedsPet && !selectedIngredient
 
             if (!fallbackLayout) {
               return null
@@ -1097,7 +1142,7 @@ function App() {
               <button
                 key={ingredient}
                 type="button"
-                className={`layout-edit-target table-ingredient ${selected ? 'selected' : ''} ${highlighted ? 'highlighted' : ''} ${shaking ? 'shake' : ''} ${draggedIngredient === ingredient ? 'dragging' : ''}`}
+                className={`layout-edit-target table-ingredient ${selected ? 'selected' : ''} ${highlighted ? 'highlighted' : ''} ${nudged ? 'nudged' : ''} ${shaking ? 'shake' : ''} ${draggedIngredient === ingredient ? 'dragging' : ''}`}
                 aria-label={ingredient}
                 data-layout-label={ingredient}
                 ref={(node) => {
