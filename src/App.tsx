@@ -123,7 +123,7 @@ const CHEFS: Record<
   yuto: {
     name: 'Yuto',
     emoji: '🧑‍🍳',
-    image: '/assets/characters/yuto.png',
+    image: '/assets/characters/yuto.webp',
     accent: '#df7c69',
     role: 'Dish Cook',
     vibe: 'Handles the warm plates, stacks, and bakery sweets.',
@@ -131,7 +131,7 @@ const CHEFS: Record<
   akari: {
     name: 'Akari',
     emoji: '👩‍🍳',
-    image: '/assets/characters/akari.png',
+    image: '/assets/characters/akari.webp',
     accent: '#79b394',
     role: 'Drink Maker',
     vibe: 'Handles creamy lattes, chilled sodas, and cafe drinks.',
@@ -187,7 +187,7 @@ const INGREDIENT_META: Record<string, IngredientMeta> = {
   },
   Sugar: {
     icon: '🍬',
-    image: '/assets/ingredients/sugar.png',
+    image: '/assets/ingredients/sugar.webp',
     tint: '#e9d8ff',
     accent: '#b995ff',
     subtitle: 'Sweet crystal pop',
@@ -229,7 +229,7 @@ const INGREDIENT_META: Record<string, IngredientMeta> = {
   },
   Milk: {
     icon: '🥛',
-    image: '/assets/ingredients/milk.png',
+    image: '/assets/ingredients/milk.webp',
     tint: '#f3f4ff',
     accent: '#bcc6f3',
     subtitle: 'Velvet foam layer',
@@ -257,7 +257,7 @@ const INGREDIENT_META: Record<string, IngredientMeta> = {
   },
   Ice: {
     icon: '🧊',
-    image: '/assets/ingredients/ice.png',
+    image: '/assets/ingredients/ice.webp',
     tint: '#e9f8ff',
     accent: '#9fd9f3',
     subtitle: 'Cold crystal cubes',
@@ -266,8 +266,8 @@ const INGREDIENT_META: Record<string, IngredientMeta> = {
 
 const RECIPE_LAYER_ASSETS: Partial<Record<RecipeId, Record<string, string>>> = {
   cookie: {
-    'Butter Dough': '/assets/recipes/cookie/base.png',
-    Sugar: '/assets/recipes/cookie/sugar.png',
+    'Butter Dough': '/assets/recipes/cookie/base.webp',
+    Sugar: '/assets/recipes/cookie/sugar.webp',
     'Cat Icing': '/assets/recipes/cookie/cat-icing.png',
   },
   pancake: {
@@ -287,11 +287,11 @@ const RECIPE_LAYER_ASSETS: Partial<Record<RecipeId, Record<string, string>>> = {
   },
 }
 
-const MOCHI_IMAGE_SRC = '/assets/characters/mochi.png'
+const MOCHI_IMAGE_SRC = '/assets/characters/mochi.webp'
 
 const STAGE_IMAGE_ASSETS = [
-  '/assets/backgrounds/kawaii-room-layer.png',
-  '/assets/backgrounds/kawaii-table-foreground.png',
+  '/assets/backgrounds/kawaii-room-layer.webp',
+  '/assets/backgrounds/kawaii-table-foreground.webp',
   '/assets/backgrounds/gametitle.png',
 ]
 
@@ -1197,7 +1197,7 @@ function App() {
   return (
     <div className="play-shell">
       <main ref={stageRef} className={`game-stage ${stageDebugClasses}`} aria-label="Kawaii Cat Cafe cooking stage">
-        <img src="/assets/backgrounds/kawaii-room-layer.png" alt="" className="stage-layer room-layer" draggable={false} />
+        <img src="/assets/backgrounds/kawaii-room-layer.webp" alt="" className="stage-layer room-layer" draggable={false} />
         {!loadingActive ? (
           <button
             type="button"
@@ -1231,7 +1231,7 @@ function App() {
           </div>
         ) : null}
 
-        <img src="/assets/backgrounds/kawaii-table-foreground.png" alt="" className="stage-layer table-layer" draggable={false} />
+        <img src="/assets/backgrounds/kawaii-table-foreground.webp" alt="" className="stage-layer table-layer" draggable={false} />
 
         {mochiReady ? <section className="ingredients-layer" aria-label="Ingredient table">
           {ALL_INGREDIENTS.map((ingredient) => {
