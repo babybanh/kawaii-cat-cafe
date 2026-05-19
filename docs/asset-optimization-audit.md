@@ -36,3 +36,10 @@
 ## Implementation Note
 
 This pass does not convert or delete assets. It adds a loading gate where the background and Mochi are prioritized for the loading screen, Yuto and Akari are revealed together afterward, and future recipe/concept art is deferred so the existing design stays stable while we measure the next compression step.
+
+## 2026-05-19 Safe Optimization Test
+
+- Replaced character, ingredient, and recipe-layer PNGs with downscaled optimized PNG copies, preserving alpha and existing file paths.
+- Switched `kawaii-room-layer` and `gametitle` to optimized WebP copies and removed the replaced PNG files because no runtime code references them.
+- Left `kawaii-table-foreground.png` unchanged because the available optimized table background is not alpha-safe for that foreground layer.
+- Left legacy unused backgrounds in place for a separate cleanup pass.
