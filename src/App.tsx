@@ -290,9 +290,9 @@ const RECIPE_LAYER_ASSETS: Partial<Record<RecipeId, Record<string, string>>> = {
 const MOCHI_IMAGE_SRC = '/assets/characters/mochi.png'
 
 const STAGE_IMAGE_ASSETS = [
-  '/assets/backgrounds/kawaii-room-layer.png',
+  '/assets/backgrounds/kawaii-room-layer.webp',
   '/assets/backgrounds/kawaii-table-foreground.png',
-  '/assets/backgrounds/gametitle.png',
+  '/assets/backgrounds/gametitle.webp',
 ]
 
 const STAGE_BACKGROUND_IMAGE_ASSETS = STAGE_IMAGE_ASSETS.slice(0, 2)
@@ -1197,7 +1197,7 @@ function App() {
   return (
     <div className="play-shell">
       <main ref={stageRef} className={`game-stage ${stageDebugClasses}`} aria-label="Kawaii Cat Cafe cooking stage">
-        <img src="/assets/backgrounds/kawaii-room-layer.png" alt="" className="stage-layer room-layer" draggable={false} />
+        <img src="/assets/backgrounds/kawaii-room-layer.webp" alt="" className="stage-layer room-layer" draggable={false} />
         {!loadingActive ? (
           <button
             type="button"
@@ -1205,7 +1205,7 @@ function App() {
             aria-label="Open original game concept artwork"
             onClick={() => setConceptOpen(true)}
           >
-            <img src="/assets/backgrounds/gametitle.png" alt="" draggable={false} />
+            <img src="/assets/backgrounds/gametitle.webp" alt="" draggable={false} />
           </button>
         ) : null}
 
