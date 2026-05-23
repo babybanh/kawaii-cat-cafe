@@ -1785,6 +1785,15 @@
   }
 }
 
+@keyframes ingredientTutorialBob {
+  from {
+    transform: translateY(0) scale(var(--image-scale, 1));
+  }
+  to {
+    transform: translateY(-6px) scale(calc(var(--image-scale, 1) * 1.03));
+  }
+}
+
 @keyframes ingredientNudge {
   0%, 100% {
     transform: translateY(0) rotate(0deg) scale(var(--image-scale, 1));
@@ -2532,12 +2541,30 @@
   animation: ingredientBob 1050ms ease-in-out infinite alternate;
 }
 
+.game-stage .table-ingredient.tutorial-guided::before {
+  opacity: 0.94;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.72),
+    0 0 18px rgba(224, 132, 151, 0.28),
+    0 10px 18px rgba(120, 70, 50, 0.12);
+  animation: neededPulse 820ms ease-in-out infinite alternate;
+}
+
+.game-stage .table-ingredient.tutorial-guided img {
+  animation: ingredientTutorialBob 820ms ease-in-out infinite alternate;
+}
+
 .game-stage .table-ingredient.nudged img {
+  animation: ingredientNudge 780ms ease-in-out 2;
+}
+
+.game-stage .table-ingredient.tutorial-guided.nudged img {
   animation: ingredientNudge 780ms ease-in-out 2;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .game-stage .table-ingredient.highlighted img,
+  .game-stage .table-ingredient.tutorial-guided img,
   .game-stage .table-ingredient.nudged img {
     animation: none;
   }

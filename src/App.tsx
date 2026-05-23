@@ -41,6 +41,8 @@ const MOCHI_TIMER_DURATIONS_MS = [60000, 40000, 20000]
 const MOCHI_FOCUS_OVERLAY_DELAYS_MS = [3000, 5000, 7000]
 const MOCHI_STREAK_TARGET = 3
 const INGREDIENT_NUDGE_DELAY_MS = 5000
+const TUTORIAL_INGREDIENT_STEPS = 3
+const TUTORIAL_INGREDIENT_NUDGE_INTERVAL_MS = 2000
 const CHARACTER_ASSET_LOAD_TIMEOUT_MS = 6000
 const CRITICAL_ASSET_LOAD_TIMEOUT_MS = 9000
 const RECIPE_TEXT_MIN_WIDTH = 210
@@ -348,6 +350,7 @@ function App() {
   const [shakeIngredient, setShakeIngredient] = useState<string | null>(null)
   const [nudgedIngredient, setNudgedIngredient] = useState<string | null>(null)
   const [ingredientNudgeToken, setIngredientNudgeToken] = useState(0)
+  const [tutorialIngredientPickCount, setTutorialIngredientPickCount] = useState(0)
   const [mochiTimerStep, setMochiTimerStep] = useState(0)
   const [mochiTimerDuration, setMochiTimerDuration] = useState(MOCHI_TIMER_DURATIONS_MS[0])
   const [mochiDeadline, setMochiDeadline] = useState(() => Date.now() + MOCHI_TIMER_DURATIONS_MS[0])
@@ -372,6 +375,8 @@ function App() {
   const instructionTimerRef = useRef<number | null>(null)
   const shakeTimerRef = useRef<number | null>(null)
   const ingredientNudgeTimerRef = useRef<number | null>(null)
+  const ingredientNudgeIntervalRef = useRef<number | null>(null)
+  const ingredientNudgeResetTimerRef = useRef<number | null>(null)
   const mochiCelebrateTimerRef = useRef<number | null>(null)
 
   const recipe = RECIPES[recipeIndex]
@@ -388,6 +393,7 @@ function App() {
   const recipeReadyToFinish = placedIngredients.length === recipe.ingredients.length
   const mochiTimerProgress = clamp(mochiTimeLeft / mochiTimerDuration, 0, 1)
   const mochiSecondsLeft = Math.max(0, Math.ceil(mochiTimeLeft / 1000))
+  const ingredientTutorialActive = tutorialIngredientPickCount < TUTORIAL_INGREDIENT_STEPS
   const akariBubbleMode = catNeedsPet ? 'cat' : recipeReadyToFinish ? 'action' : null
   const defaultPrepInstruction = loadingActive
     ? 'loading...'
@@ -491,6 +497,12 @@ function App() {
       }
       if (ingredientNudgeTimerRef.current) {
         window.clearTimeout(ingredientNudgeTimerRef.current)
+      }
+      if (ingredientNudgeIntervalRef.current) {
+        window.clearInterval(ingredientNudgeIntervalRef.current)
+      }
+      if (ingredientNudgeResetTimerRef.current) {
+        window.clearTimeout(ingredientNudgeResetTimerRef.current)
       }
       if (musicGapTimerRef.current) {
         window.clearTimeout(musicGapTimerRef.current)
@@ -629,9 +641,39 @@ function App() {
       window.clearTimeout(ingredientNudgeTimerRef.current)
       ingredientNudgeTimerRef.current = null
     }
+    if (ingredientNudgeIntervalRef.current) {
+      window.clearInterval(ingredientNudgeIntervalRef.current)
+      ingredientNudgeIntervalRef.current = null
+    }
+    if (ingredientNudgeResetTimerRef.current) {
+      window.clearTimeout(ingredientNudgeResetTimerRef.current)
+      ingredientNudgeResetTimerRef.current = null
+    }
 
     if (!gameStarted || catNeedsPet || !nextIngredient || selectedIngredient) {
       return
+    }
+
+    const triggerNudge = () => {
+      setNudgedIngredient(null)
+      ingredientNudgeResetTimerRef.current = window.setTimeout(() => {
+        setNudgedIngredient(nextIngredient)
+        ingredientNudgeResetTimerRef.current = null
+      }, 20)
+    }
+
+    if (ingredientTutorialActive) {
+      ingredientNudgeIntervalRef.current = window.setInterval(triggerNudge, TUTORIAL_INGREDIENT_NUDGE_INTERVAL_MS)
+      return () => {
+        if (ingredientNudgeIntervalRef.current) {
+          window.clearInterval(ingredientNudgeIntervalRef.current)
+          ingredientNudgeIntervalRef.current = null
+        }
+        if (ingredientNudgeResetTimerRef.current) {
+          window.clearTimeout(ingredientNudgeResetTimerRef.current)
+          ingredientNudgeResetTimerRef.current = null
+        }
+      }
     }
 
     ingredientNudgeTimerRef.current = window.setTimeout(() => {
@@ -645,7 +687,7 @@ function App() {
         ingredientNudgeTimerRef.current = null
       }
     }
-  }, [catNeedsPet, gameStarted, ingredientNudgeToken, nextIngredient, selectedIngredient])
+  }, [catNeedsPet, gameStarted, ingredientNudgeToken, ingredientTutorialActive, nextIngredient, selectedIngredient])
 
   useEffect(() => {
     const note = recipeNoteRef.current
@@ -1041,6 +1083,7 @@ function App() {
 
     const nextPlaced = [...placedIngredients, ingredientToPlace]
     setPlacedIngredients(nextPlaced)
+    setTutorialIngredientPickCount((count) => Math.min(count + 1, TUTORIAL_INGREDIENT_STEPS))
     setSelectedIngredient(null)
     setDraggedIngredient(null)
 
@@ -1241,6 +1284,7 @@ function App() {
             const selected = selectedIngredient === ingredient
             const highlighted = nextIngredient === ingredient
             const shaking = shakeIngredient === ingredient
+            const tutorialGuided = ingredientTutorialActive && highlighted && gameStarted && !catNeedsPet && !selectedIngredient
             const nudged = nudgedIngredient === ingredient && highlighted && gameStarted && !catNeedsPet && !selectedIngredient
 
             if (!fallbackLayout) {
@@ -1251,7 +1295,7 @@ function App() {
               <button
                 key={ingredient}
                 type="button"
-                className={`layout-edit-target table-ingredient ${selected ? 'selected' : ''} ${highlighted ? 'highlighted' : ''} ${nudged ? 'nudged' : ''} ${shaking ? 'shake' : ''} ${draggedIngredient === ingredient ? 'dragging' : ''}`}
+                className={`layout-edit-target table-ingredient ${selected ? 'selected' : ''} ${highlighted ? 'highlighted' : ''} ${tutorialGuided ? 'tutorial-guided' : ''} ${nudged ? 'nudged' : ''} ${shaking ? 'shake' : ''} ${draggedIngredient === ingredient ? 'dragging' : ''}`}
                 aria-label={ingredient}
                 data-layout-label={ingredient}
                 ref={(node) => {
