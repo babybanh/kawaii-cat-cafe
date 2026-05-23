@@ -45,6 +45,16 @@ const TUTORIAL_INGREDIENT_STEPS = 3
 const TUTORIAL_INGREDIENT_NUDGE_INTERVAL_MS = 2000
 const TUTORIAL_INGREDIENT_FLY_DURATION_MS = 1120
 const INGREDIENT_FLY_DURATION_MS = 950
+const SERVE_FOCUS_OVERLAY_DELAY_MS = 5000
+const MOCHI_INTRO_PROMPTS = ['Mochi the cat needs pets!', 'Pet Mochi the Cat!']
+const MOCHI_PET_PROMPTS = [
+  'Pet Mochi the cat!',
+  'Give Mochi attention!',
+  'Make Mochi the cat purr!',
+  'Pet Mochi to keep cooking',
+  'Hurry, pet Mochi the cat!',
+  'Pet Mochi Cat!',
+]
 const CHARACTER_ASSET_LOAD_TIMEOUT_MS = 6000
 const CRITICAL_ASSET_LOAD_TIMEOUT_MS = 9000
 const RECIPE_TEXT_MIN_WIDTH = 210
@@ -151,7 +161,7 @@ const RECIPES: Recipe[] = [
     owner: 'yuto',
     intro: 'Build the cookie filling in order, then bake it.',
     ingredients: ['Butter Dough', 'Sugar', 'Cat Icing'],
-    finishLabel: 'Bake Cookie',
+    finishLabel: 'Serve Cat Cookie',
   },
   {
     id: 'pancake',
@@ -160,7 +170,7 @@ const RECIPES: Recipe[] = [
     owner: 'yuto',
     intro: 'Layer the pancake ingredients in order, then flip and serve.',
     ingredients: ['Berry Batter', 'Berries', 'Whipped Cream'],
-    finishLabel: 'Flip Pancake',
+    finishLabel: 'Serve Berry Pancake',
   },
   {
     id: 'latte',
@@ -169,7 +179,7 @@ const RECIPES: Recipe[] = [
     owner: 'akari',
     intro: 'Build the latte from base to topping, then steam it.',
     ingredients: ['Matcha', 'Milk', 'Honey'],
-    finishLabel: 'Steam Latte',
+    finishLabel: 'Serve Honey Latte',
   },
   {
     id: 'soda',
@@ -178,7 +188,7 @@ const RECIPES: Recipe[] = [
     owner: 'akari',
     intro: 'Stack the soda ingredients cleanly, then pour it cold.',
     ingredients: ['Strawberry Syrup', 'Soda', 'Ice'],
-    finishLabel: 'Pour Soda',
+    finishLabel: 'Serve Strawberry Soda',
   },
 ]
 
@@ -359,12 +369,15 @@ function App() {
   const [mochiDeadline, setMochiDeadline] = useState(() => Date.now() + MOCHI_TIMER_DURATIONS_MS[0])
   const [mochiTimeLeft, setMochiTimeLeft] = useState(MOCHI_TIMER_DURATIONS_MS[0])
   const [mochiRecipeStreak, setMochiRecipeStreak] = useState(0)
+  const [mochiIntroInstruction] = useState(getRandomMochiIntroPrompt)
+  const [mochiPetInstruction, setMochiPetInstruction] = useState(getRandomMochiPetPrompt)
   const [mochiCelebrating, setMochiCelebrating] = useState(false)
   const [mochiReady, setMochiReady] = useState(false)
   const [charactersReady, setCharactersReady] = useState(false)
   const [criticalAssetsReady, setCriticalAssetsReady] = useState(false)
   const [gameStarted, setGameStarted] = useState(false)
   const [mochiFocusOverlay, setMochiFocusOverlay] = useState(false)
+  const [serveFocusOverlay, setServeFocusOverlay] = useState(false)
   const [musicEnabled, setMusicEnabled] = useState(true)
   const [musicStarted, setMusicStarted] = useState(false)
   const [creditsOpen, setCreditsOpen] = useState(false)
@@ -397,13 +410,15 @@ function App() {
   const mochiTimerProgress = clamp(mochiTimeLeft / mochiTimerDuration, 0, 1)
   const mochiSecondsLeft = Math.max(0, Math.ceil(mochiTimeLeft / 1000))
   const ingredientTutorialActive = tutorialIngredientPickCount < TUTORIAL_INGREDIENT_STEPS
+  const serveFocusEligible = gameStarted && recipeReadyToFinish
+  const serveFocusActive = serveFocusOverlay && serveFocusEligible && !catNeedsPet && !modalOpen
   const akariBubbleMode = catNeedsPet ? 'cat' : recipeReadyToFinish ? 'action' : null
   const defaultPrepInstruction = loadingActive
     ? 'loading...'
     : catNeedsPet
-    ? 'Tap Mochi to keep cooking'
+    ? mochiPetInstruction
     : introActive
-      ? 'Tap Mochi to keep cooking'
+      ? mochiIntroInstruction
     : nextIngredient
       ? selectedIngredient
         ? `Drop ${selectedIngredient} on mat`
@@ -473,6 +488,7 @@ function App() {
   const stageDebugClasses = [
     editMode ? 'is-editing-layout' : '',
     mochiFocusActive ? 'mochi-focus-active' : '',
+    serveFocusActive ? 'serve-focus-active' : '',
     loadingActive ? 'assets-loading' : '',
     introActive ? 'intro-active' : '',
     SHOW_LAYOUT_BOXES ? 'show-layout-boxes' : '',
@@ -632,12 +648,27 @@ function App() {
       return
     }
 
+    setMochiPetInstruction((current) => getRandomMochiPetPrompt(current))
+
     const focusTimer = window.setTimeout(() => {
       setMochiFocusOverlay(true)
     }, MOCHI_FOCUS_OVERLAY_DELAYS_MS[mochiTimerStep] ?? MOCHI_FOCUS_OVERLAY_DELAYS_MS[MOCHI_FOCUS_OVERLAY_DELAYS_MS.length - 1])
 
     return () => window.clearTimeout(focusTimer)
   }, [catNeedsPet, mochiTimerStep])
+
+  useEffect(() => {
+    if (!serveFocusEligible || catNeedsPet || modalOpen) {
+      setServeFocusOverlay(false)
+      return
+    }
+
+    const focusTimer = window.setTimeout(() => {
+      setServeFocusOverlay(true)
+    }, SERVE_FOCUS_OVERLAY_DELAY_MS)
+
+    return () => window.clearTimeout(focusTimer)
+  }, [catNeedsPet, modalOpen, serveFocusEligible])
 
   useEffect(() => {
     if (ingredientNudgeTimerRef.current) {
@@ -1018,12 +1049,12 @@ function App() {
     }
 
     if (introActive) {
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiIntroInstruction, 'cat')
       return
     }
 
     if (catNeedsPet) {
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiPetInstruction, 'cat')
       return
     }
 
@@ -1051,12 +1082,12 @@ function App() {
     }
 
     if (introActive) {
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiIntroInstruction, 'cat')
       return
     }
 
     if (catNeedsPet) {
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiPetInstruction, 'cat')
       return
     }
 
@@ -1106,12 +1137,12 @@ function App() {
     }
 
     if (introActive) {
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiIntroInstruction, 'cat')
       return
     }
 
     if (catNeedsPet) {
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiPetInstruction, 'cat')
       return
     }
 
@@ -1126,6 +1157,7 @@ function App() {
     const earnedMochiBonus = nextStreak >= MOCHI_STREAK_TARGET
     const pointsEarned = POINTS_PER_DISH + (earnedMochiBonus ? POINTS_STREAK_BONUS : 0)
 
+    setServeFocusOverlay(false)
     setServed(nextServed)
     addScore(pointsEarned)
     setPlacedIngredients([])
@@ -1193,13 +1225,13 @@ function App() {
 
     if (introActive) {
       event.preventDefault()
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiIntroInstruction, 'cat')
       return
     }
 
     if (catNeedsPet) {
       event.preventDefault()
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiPetInstruction, 'cat')
       return
     }
 
@@ -1417,7 +1449,7 @@ function App() {
             {recipeReadyToFinish && !catNeedsPet ? (
               <button
                 type="button"
-                className="prep-action-button"
+                className={`prep-action-button ${serveFocusActive ? 'tutorial-serve-nudge' : ''}`}
                 data-testid="prep-action-button"
                 aria-disabled={catNeedsPet}
                 onClick={(event) => {
@@ -1427,7 +1459,6 @@ function App() {
                   }
                 }}
               >
-                <img src={getRecipeThumbnail(recipe)} alt="" />
                 <strong>{recipe.finishLabel}</strong>
               </button>
             ) : (
@@ -1495,10 +1526,10 @@ function App() {
           <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'mochi', STAGE_LAYOUT.mochi, 'resize')} />
         </div> : null}
 
-        {mochiFocusActive ? (
+        {mochiFocusActive || serveFocusActive ? (
           <>
             <div className="mochi-focus-scrim" aria-hidden="true" />
-            {focusControlsVisible ? (
+            {focusControlsVisible || serveFocusActive ? (
               <button type="button" className="focus-credits-toggle" onClick={() => setCreditsOpen(true)}>
                 Credits
               </button>
@@ -1510,12 +1541,12 @@ function App() {
           <div className={`akari-thought-bubble ${akariBubbleMode}`} role="status" aria-live="polite">
             {akariBubbleMode === 'cat' ? (
               <>
-                <strong>Tap Mochi to keep cooking.</strong>
+                <strong>{mochiPetInstruction}</strong>
                 <span>Mochi will be happy.</span>
               </>
             ) : (
               <>
-                <strong>All set.</strong>
+                <strong>Ready to serve.</strong>
                 <span>Tap {recipe.finishLabel}.</span>
               </>
             )}
@@ -2115,6 +2146,20 @@ function maybeStoreBest(score: number, best: number, setBest: (value: number) =>
 
   window.localStorage.setItem(BEST_SCORE_KEY, String(score))
   setBest(score)
+}
+
+function getRandomMochiIntroPrompt() {
+  return pickRandomPrompt(MOCHI_INTRO_PROMPTS)
+}
+
+function getRandomMochiPetPrompt(excludePrompt?: string) {
+  return pickRandomPrompt(MOCHI_PET_PROMPTS, excludePrompt)
+}
+
+function pickRandomPrompt(prompts: string[], excludePrompt?: string) {
+  const candidates = prompts.length > 1 ? prompts.filter((prompt) => prompt !== excludePrompt) : prompts
+
+  return candidates[Math.floor(Math.random() * candidates.length)] ?? prompts[0]
 }
 
 function percentToNumber(value: string) {
