@@ -43,6 +43,8 @@ const MOCHI_STREAK_TARGET = 3
 const INGREDIENT_NUDGE_DELAY_MS = 5000
 const TUTORIAL_INGREDIENT_STEPS = 3
 const TUTORIAL_INGREDIENT_NUDGE_INTERVAL_MS = 2000
+const TUTORIAL_INGREDIENT_FLY_DURATION_MS = 1120
+const INGREDIENT_FLY_DURATION_MS = 950
 const CHARACTER_ASSET_LOAD_TIMEOUT_MS = 6000
 const CRITICAL_ASSET_LOAD_TIMEOUT_MS = 9000
 const RECIPE_TEXT_MIN_WIDTH = 210
@@ -77,6 +79,7 @@ type IngredientFlyAnimation = {
   deltaX: number
   deltaY: number
   size: number
+  durationMs: number
 }
 
 const INGREDIENT_LAYOUT: Record<string, IngredientLayout> = {
@@ -403,7 +406,7 @@ function App() {
       ? 'Tap Mochi to keep cooking'
     : nextIngredient
       ? selectedIngredient
-        ? `Tap mat to add ${selectedIngredient}`
+        ? `Drop ${selectedIngredient} on mat`
         : `Tap ${nextIngredient}`
       : recipe.finishLabel
   const desktopPrepInstruction =
@@ -973,7 +976,7 @@ function App() {
     }, 360)
   }
 
-  const animateIngredientToMat = (ingredient: string) => {
+  const animateIngredientToMat = (ingredient: string, durationMs: number) => {
     const stage = stageRef.current
     const source = ingredientRefs.current[ingredient]
     const target = prepHitRef.current
@@ -1003,6 +1006,7 @@ function App() {
       deltaX,
       deltaY,
       size,
+      durationMs,
     })
     ingredientFlyIdRef.current += 1
   }
@@ -1037,8 +1041,7 @@ function App() {
       return
     }
 
-    setSelectedIngredient(ingredient)
-    showInstruction(`Tap mat to add ${ingredient}`, 'good')
+    placeIngredient(ingredient, true)
   }
 
   const placeIngredient = (ingredient: string | null, animateFromSelection = false) => {
@@ -1078,7 +1081,8 @@ function App() {
     }
 
     if (animateFromSelection) {
-      animateIngredientToMat(ingredientToPlace)
+      const durationMs = ingredientTutorialActive ? TUTORIAL_INGREDIENT_FLY_DURATION_MS : INGREDIENT_FLY_DURATION_MS
+      animateIngredientToMat(ingredientToPlace, durationMs)
     }
 
     const nextPlaced = [...placedIngredients, ingredientToPlace]
@@ -1392,6 +1396,7 @@ function App() {
               ['--fly-delta-x' as string]: `${ingredientFly.deltaX}px`,
               ['--fly-delta-y' as string]: `${ingredientFly.deltaY}px`,
               ['--fly-size' as string]: `${ingredientFly.size}px`,
+              ['--fly-duration' as string]: `${ingredientFly.durationMs}ms`,
             }}
           >
             <img src={ingredientFly.image} alt="" draggable={false} />
