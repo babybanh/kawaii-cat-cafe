@@ -37,10 +37,24 @@ const BEST_SCORE_KEY = 'kawaii-cat-cafe-best-score'
 const LAYOUT_STORAGE_KEY = 'kawaii-cat-cafe-layout-overrides-v5'
 const BACKGROUND_MUSIC_SRC = '/assets/audio/kawaii-cat-cafe-score.mp3'
 const MUSIC_RESTART_GAP_MS = 1000
-const MOCHI_TIMER_DURATIONS_MS = [40000, 30000, 20000]
-const MOCHI_FOCUS_OVERLAY_DELAYS_MS = [5000, 7000, 10000]
+const MOCHI_TIMER_DURATIONS_MS = [60000, 40000, 20000]
+const MOCHI_FOCUS_OVERLAY_DELAYS_MS = [3000, 5000, 7000]
 const MOCHI_STREAK_TARGET = 3
 const INGREDIENT_NUDGE_DELAY_MS = 5000
+const TUTORIAL_INGREDIENT_STEPS = 3
+const TUTORIAL_INGREDIENT_NUDGE_INTERVAL_MS = 2000
+const TUTORIAL_INGREDIENT_FLY_DURATION_MS = 1120
+const INGREDIENT_FLY_DURATION_MS = 950
+const SERVE_FOCUS_OVERLAY_DELAY_MS = 5000
+const MOCHI_INTRO_PROMPTS = ['Mochi the cat needs pets!', 'Pet Mochi the Cat!']
+const MOCHI_PET_PROMPTS = [
+  'Pet Mochi the cat!',
+  'Give Mochi attention!',
+  'Make Mochi the cat purr!',
+  'Pet Mochi to keep cooking',
+  'Hurry, pet Mochi the cat!',
+  'Pet Mochi Cat!',
+]
 const CHARACTER_ASSET_LOAD_TIMEOUT_MS = 6000
 const CRITICAL_ASSET_LOAD_TIMEOUT_MS = 9000
 const RECIPE_TEXT_MIN_WIDTH = 210
@@ -75,6 +89,7 @@ type IngredientFlyAnimation = {
   deltaX: number
   deltaY: number
   size: number
+  durationMs: number
 }
 
 const INGREDIENT_LAYOUT: Record<string, IngredientLayout> = {
@@ -146,7 +161,7 @@ const RECIPES: Recipe[] = [
     owner: 'yuto',
     intro: 'Build the cookie filling in order, then bake it.',
     ingredients: ['Butter Dough', 'Sugar', 'Cat Icing'],
-    finishLabel: 'Bake Cookie',
+    finishLabel: 'Serve Cat Cookie',
   },
   {
     id: 'pancake',
@@ -155,7 +170,7 @@ const RECIPES: Recipe[] = [
     owner: 'yuto',
     intro: 'Layer the pancake ingredients in order, then flip and serve.',
     ingredients: ['Berry Batter', 'Berries', 'Whipped Cream'],
-    finishLabel: 'Flip Pancake',
+    finishLabel: 'Serve Berry Pancake',
   },
   {
     id: 'latte',
@@ -164,7 +179,7 @@ const RECIPES: Recipe[] = [
     owner: 'akari',
     intro: 'Build the latte from base to topping, then steam it.',
     ingredients: ['Matcha', 'Milk', 'Honey'],
-    finishLabel: 'Steam Latte',
+    finishLabel: 'Serve Honey Latte',
   },
   {
     id: 'soda',
@@ -173,7 +188,7 @@ const RECIPES: Recipe[] = [
     owner: 'akari',
     intro: 'Stack the soda ingredients cleanly, then pour it cold.',
     ingredients: ['Strawberry Syrup', 'Soda', 'Ice'],
-    finishLabel: 'Pour Soda',
+    finishLabel: 'Serve Strawberry Soda',
   },
 ]
 
@@ -348,17 +363,21 @@ function App() {
   const [shakeIngredient, setShakeIngredient] = useState<string | null>(null)
   const [nudgedIngredient, setNudgedIngredient] = useState<string | null>(null)
   const [ingredientNudgeToken, setIngredientNudgeToken] = useState(0)
+  const [tutorialIngredientPickCount, setTutorialIngredientPickCount] = useState(0)
   const [mochiTimerStep, setMochiTimerStep] = useState(0)
   const [mochiTimerDuration, setMochiTimerDuration] = useState(MOCHI_TIMER_DURATIONS_MS[0])
   const [mochiDeadline, setMochiDeadline] = useState(() => Date.now() + MOCHI_TIMER_DURATIONS_MS[0])
   const [mochiTimeLeft, setMochiTimeLeft] = useState(MOCHI_TIMER_DURATIONS_MS[0])
   const [mochiRecipeStreak, setMochiRecipeStreak] = useState(0)
+  const [mochiIntroInstruction] = useState(getRandomMochiIntroPrompt)
+  const [mochiPetInstruction, setMochiPetInstruction] = useState(getRandomMochiPetPrompt)
   const [mochiCelebrating, setMochiCelebrating] = useState(false)
   const [mochiReady, setMochiReady] = useState(false)
   const [charactersReady, setCharactersReady] = useState(false)
   const [criticalAssetsReady, setCriticalAssetsReady] = useState(false)
   const [gameStarted, setGameStarted] = useState(false)
   const [mochiFocusOverlay, setMochiFocusOverlay] = useState(false)
+  const [serveFocusOverlay, setServeFocusOverlay] = useState(false)
   const [musicEnabled, setMusicEnabled] = useState(true)
   const [musicStarted, setMusicStarted] = useState(false)
   const [creditsOpen, setCreditsOpen] = useState(false)
@@ -372,6 +391,8 @@ function App() {
   const instructionTimerRef = useRef<number | null>(null)
   const shakeTimerRef = useRef<number | null>(null)
   const ingredientNudgeTimerRef = useRef<number | null>(null)
+  const ingredientNudgeIntervalRef = useRef<number | null>(null)
+  const ingredientNudgeResetTimerRef = useRef<number | null>(null)
   const mochiCelebrateTimerRef = useRef<number | null>(null)
 
   const recipe = RECIPES[recipeIndex]
@@ -388,16 +409,19 @@ function App() {
   const recipeReadyToFinish = placedIngredients.length === recipe.ingredients.length
   const mochiTimerProgress = clamp(mochiTimeLeft / mochiTimerDuration, 0, 1)
   const mochiSecondsLeft = Math.max(0, Math.ceil(mochiTimeLeft / 1000))
+  const ingredientTutorialActive = tutorialIngredientPickCount < TUTORIAL_INGREDIENT_STEPS
+  const serveFocusEligible = gameStarted && recipeReadyToFinish
+  const serveFocusActive = serveFocusOverlay && serveFocusEligible && !catNeedsPet && !modalOpen
   const akariBubbleMode = catNeedsPet ? 'cat' : recipeReadyToFinish ? 'action' : null
   const defaultPrepInstruction = loadingActive
     ? 'loading...'
     : catNeedsPet
-    ? 'Tap Mochi to keep cooking'
+    ? mochiPetInstruction
     : introActive
-      ? 'Tap Mochi to keep cooking'
+      ? mochiIntroInstruction
     : nextIngredient
       ? selectedIngredient
-        ? `Tap mat to add ${selectedIngredient}`
+        ? `Drop ${selectedIngredient} on mat`
         : `Tap ${nextIngredient}`
       : recipe.finishLabel
   const desktopPrepInstruction =
@@ -464,6 +488,7 @@ function App() {
   const stageDebugClasses = [
     editMode ? 'is-editing-layout' : '',
     mochiFocusActive ? 'mochi-focus-active' : '',
+    serveFocusActive ? 'serve-focus-active' : '',
     loadingActive ? 'assets-loading' : '',
     introActive ? 'intro-active' : '',
     SHOW_LAYOUT_BOXES ? 'show-layout-boxes' : '',
@@ -491,6 +516,12 @@ function App() {
       }
       if (ingredientNudgeTimerRef.current) {
         window.clearTimeout(ingredientNudgeTimerRef.current)
+      }
+      if (ingredientNudgeIntervalRef.current) {
+        window.clearInterval(ingredientNudgeIntervalRef.current)
+      }
+      if (ingredientNudgeResetTimerRef.current) {
+        window.clearTimeout(ingredientNudgeResetTimerRef.current)
       }
       if (musicGapTimerRef.current) {
         window.clearTimeout(musicGapTimerRef.current)
@@ -617,6 +648,8 @@ function App() {
       return
     }
 
+    setMochiPetInstruction((current) => getRandomMochiPetPrompt(current))
+
     const focusTimer = window.setTimeout(() => {
       setMochiFocusOverlay(true)
     }, MOCHI_FOCUS_OVERLAY_DELAYS_MS[mochiTimerStep] ?? MOCHI_FOCUS_OVERLAY_DELAYS_MS[MOCHI_FOCUS_OVERLAY_DELAYS_MS.length - 1])
@@ -625,13 +658,56 @@ function App() {
   }, [catNeedsPet, mochiTimerStep])
 
   useEffect(() => {
+    if (!serveFocusEligible || catNeedsPet || modalOpen) {
+      setServeFocusOverlay(false)
+      return
+    }
+
+    const focusTimer = window.setTimeout(() => {
+      setServeFocusOverlay(true)
+    }, SERVE_FOCUS_OVERLAY_DELAY_MS)
+
+    return () => window.clearTimeout(focusTimer)
+  }, [catNeedsPet, modalOpen, serveFocusEligible])
+
+  useEffect(() => {
     if (ingredientNudgeTimerRef.current) {
       window.clearTimeout(ingredientNudgeTimerRef.current)
       ingredientNudgeTimerRef.current = null
     }
+    if (ingredientNudgeIntervalRef.current) {
+      window.clearInterval(ingredientNudgeIntervalRef.current)
+      ingredientNudgeIntervalRef.current = null
+    }
+    if (ingredientNudgeResetTimerRef.current) {
+      window.clearTimeout(ingredientNudgeResetTimerRef.current)
+      ingredientNudgeResetTimerRef.current = null
+    }
 
     if (!gameStarted || catNeedsPet || !nextIngredient || selectedIngredient) {
       return
+    }
+
+    const triggerNudge = () => {
+      setNudgedIngredient(null)
+      ingredientNudgeResetTimerRef.current = window.setTimeout(() => {
+        setNudgedIngredient(nextIngredient)
+        ingredientNudgeResetTimerRef.current = null
+      }, 20)
+    }
+
+    if (ingredientTutorialActive) {
+      ingredientNudgeIntervalRef.current = window.setInterval(triggerNudge, TUTORIAL_INGREDIENT_NUDGE_INTERVAL_MS)
+      return () => {
+        if (ingredientNudgeIntervalRef.current) {
+          window.clearInterval(ingredientNudgeIntervalRef.current)
+          ingredientNudgeIntervalRef.current = null
+        }
+        if (ingredientNudgeResetTimerRef.current) {
+          window.clearTimeout(ingredientNudgeResetTimerRef.current)
+          ingredientNudgeResetTimerRef.current = null
+        }
+      }
     }
 
     ingredientNudgeTimerRef.current = window.setTimeout(() => {
@@ -645,7 +721,7 @@ function App() {
         ingredientNudgeTimerRef.current = null
       }
     }
-  }, [catNeedsPet, gameStarted, ingredientNudgeToken, nextIngredient, selectedIngredient])
+  }, [catNeedsPet, gameStarted, ingredientNudgeToken, ingredientTutorialActive, nextIngredient, selectedIngredient])
 
   useEffect(() => {
     const note = recipeNoteRef.current
@@ -931,7 +1007,7 @@ function App() {
     }, 360)
   }
 
-  const animateIngredientToMat = (ingredient: string) => {
+  const animateIngredientToMat = (ingredient: string, durationMs: number) => {
     const stage = stageRef.current
     const source = ingredientRefs.current[ingredient]
     const target = prepHitRef.current
@@ -961,6 +1037,7 @@ function App() {
       deltaX,
       deltaY,
       size,
+      durationMs,
     })
     ingredientFlyIdRef.current += 1
   }
@@ -972,12 +1049,12 @@ function App() {
     }
 
     if (introActive) {
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiIntroInstruction, 'cat')
       return
     }
 
     if (catNeedsPet) {
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiPetInstruction, 'cat')
       return
     }
 
@@ -995,8 +1072,7 @@ function App() {
       return
     }
 
-    setSelectedIngredient(ingredient)
-    showInstruction(`Tap mat to add ${ingredient}`, 'good')
+    placeIngredient(ingredient, true)
   }
 
   const placeIngredient = (ingredient: string | null, animateFromSelection = false) => {
@@ -1006,12 +1082,12 @@ function App() {
     }
 
     if (introActive) {
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiIntroInstruction, 'cat')
       return
     }
 
     if (catNeedsPet) {
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiPetInstruction, 'cat')
       return
     }
 
@@ -1036,11 +1112,13 @@ function App() {
     }
 
     if (animateFromSelection) {
-      animateIngredientToMat(ingredientToPlace)
+      const durationMs = ingredientTutorialActive ? TUTORIAL_INGREDIENT_FLY_DURATION_MS : INGREDIENT_FLY_DURATION_MS
+      animateIngredientToMat(ingredientToPlace, durationMs)
     }
 
     const nextPlaced = [...placedIngredients, ingredientToPlace]
     setPlacedIngredients(nextPlaced)
+    setTutorialIngredientPickCount((count) => Math.min(count + 1, TUTORIAL_INGREDIENT_STEPS))
     setSelectedIngredient(null)
     setDraggedIngredient(null)
 
@@ -1059,12 +1137,12 @@ function App() {
     }
 
     if (introActive) {
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiIntroInstruction, 'cat')
       return
     }
 
     if (catNeedsPet) {
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiPetInstruction, 'cat')
       return
     }
 
@@ -1079,6 +1157,7 @@ function App() {
     const earnedMochiBonus = nextStreak >= MOCHI_STREAK_TARGET
     const pointsEarned = POINTS_PER_DISH + (earnedMochiBonus ? POINTS_STREAK_BONUS : 0)
 
+    setServeFocusOverlay(false)
     setServed(nextServed)
     addScore(pointsEarned)
     setPlacedIngredients([])
@@ -1146,13 +1225,13 @@ function App() {
 
     if (introActive) {
       event.preventDefault()
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiIntroInstruction, 'cat')
       return
     }
 
     if (catNeedsPet) {
       event.preventDefault()
-      showInstruction('Tap Mochi to keep cooking', 'cat')
+      showInstruction(mochiPetInstruction, 'cat')
       return
     }
 
@@ -1241,6 +1320,7 @@ function App() {
             const selected = selectedIngredient === ingredient
             const highlighted = nextIngredient === ingredient
             const shaking = shakeIngredient === ingredient
+            const tutorialGuided = ingredientTutorialActive && highlighted && gameStarted && !catNeedsPet && !selectedIngredient
             const nudged = nudgedIngredient === ingredient && highlighted && gameStarted && !catNeedsPet && !selectedIngredient
 
             if (!fallbackLayout) {
@@ -1251,7 +1331,7 @@ function App() {
               <button
                 key={ingredient}
                 type="button"
-                className={`layout-edit-target table-ingredient ${selected ? 'selected' : ''} ${highlighted ? 'highlighted' : ''} ${nudged ? 'nudged' : ''} ${shaking ? 'shake' : ''} ${draggedIngredient === ingredient ? 'dragging' : ''}`}
+                className={`layout-edit-target table-ingredient ${selected ? 'selected' : ''} ${highlighted ? 'highlighted' : ''} ${tutorialGuided ? 'tutorial-guided' : ''} ${nudged ? 'nudged' : ''} ${shaking ? 'shake' : ''} ${draggedIngredient === ingredient ? 'dragging' : ''}`}
                 aria-label={ingredient}
                 data-layout-label={ingredient}
                 ref={(node) => {
@@ -1348,6 +1428,7 @@ function App() {
               ['--fly-delta-x' as string]: `${ingredientFly.deltaX}px`,
               ['--fly-delta-y' as string]: `${ingredientFly.deltaY}px`,
               ['--fly-size' as string]: `${ingredientFly.size}px`,
+              ['--fly-duration' as string]: `${ingredientFly.durationMs}ms`,
             }}
           >
             <img src={ingredientFly.image} alt="" draggable={false} />
@@ -1368,7 +1449,7 @@ function App() {
             {recipeReadyToFinish && !catNeedsPet ? (
               <button
                 type="button"
-                className="prep-action-button"
+                className={`prep-action-button ${serveFocusActive ? 'tutorial-serve-nudge' : ''}`}
                 data-testid="prep-action-button"
                 aria-disabled={catNeedsPet}
                 onClick={(event) => {
@@ -1378,7 +1459,6 @@ function App() {
                   }
                 }}
               >
-                <img src={getRecipeThumbnail(recipe)} alt="" />
                 <strong>{recipe.finishLabel}</strong>
               </button>
             ) : (
@@ -1446,10 +1526,10 @@ function App() {
           <ResizeHandle editMode={editMode} onPointerDown={(event) => startLayoutEdit(event, 'mochi', STAGE_LAYOUT.mochi, 'resize')} />
         </div> : null}
 
-        {mochiFocusActive ? (
+        {mochiFocusActive || serveFocusActive ? (
           <>
             <div className="mochi-focus-scrim" aria-hidden="true" />
-            {focusControlsVisible ? (
+            {focusControlsVisible || serveFocusActive ? (
               <button type="button" className="focus-credits-toggle" onClick={() => setCreditsOpen(true)}>
                 Credits
               </button>
@@ -1461,12 +1541,12 @@ function App() {
           <div className={`akari-thought-bubble ${akariBubbleMode}`} role="status" aria-live="polite">
             {akariBubbleMode === 'cat' ? (
               <>
-                <strong>Tap Mochi to keep cooking.</strong>
+                <strong>{mochiPetInstruction}</strong>
                 <span>Mochi will be happy.</span>
               </>
             ) : (
               <>
-                <strong>All set.</strong>
+                <strong>Ready to serve.</strong>
                 <span>Tap {recipe.finishLabel}.</span>
               </>
             )}
@@ -2066,6 +2146,20 @@ function maybeStoreBest(score: number, best: number, setBest: (value: number) =>
 
   window.localStorage.setItem(BEST_SCORE_KEY, String(score))
   setBest(score)
+}
+
+function getRandomMochiIntroPrompt() {
+  return pickRandomPrompt(MOCHI_INTRO_PROMPTS)
+}
+
+function getRandomMochiPetPrompt(excludePrompt?: string) {
+  return pickRandomPrompt(MOCHI_PET_PROMPTS, excludePrompt)
+}
+
+function pickRandomPrompt(prompts: string[], excludePrompt?: string) {
+  const candidates = prompts.length > 1 ? prompts.filter((prompt) => prompt !== excludePrompt) : prompts
+
+  return candidates[Math.floor(Math.random() * candidates.length)] ?? prompts[0]
 }
 
 function percentToNumber(value: string) {
