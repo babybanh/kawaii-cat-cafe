@@ -1277,33 +1277,6 @@
     padding: 8px;
   }
 
-  .credits-panel {
-    width: min(80%, 360px);
-    padding: 24px 22px 22px;
-    border-radius: 24px 26px 22px 28px;
-  }
-
-  .credits-title {
-    font-size: clamp(1.35rem, 6.4vw, 1.9rem);
-    line-height: 0.95;
-  }
-
-  .credits-panel p {
-    margin-top: 18px;
-    font-size: clamp(0.82rem, 4.1vw, 1.08rem);
-    line-height: 1.22;
-  }
-
-  .credits-panel a:not(.credits-title) {
-    font-size: 1em;
-  }
-
-  .credits-close {
-    top: 9px;
-    right: 10px;
-    width: 32px;
-  }
-
   .game-stage {
     width: min(calc(100vw - 16px), calc(100vh - 16px));
     border-radius: 22px;
@@ -3272,8 +3245,10 @@
 
 .credits-panel {
   position: relative;
-  width: min(54%, 620px);
-  padding: 2vw 2.35vw 1.95vw;
+  width: min(540px, 88%);
+  max-height: min(86%, 620px);
+  padding: 52px 30px 34px;
+  overflow: auto;
   border-radius: 28px 30px 26px 32px;
   color: #664236;
   text-align: center;
@@ -3286,47 +3261,83 @@
 }
 
 .credits-title {
-  display: inline-block;
+  display: block;
   max-width: 100%;
+  margin: 0 auto 28px;
   color: #7b4a3d;
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2.35vw, 2.35rem);
+  font-size: clamp(2rem, 3.9vw, 2.35rem);
   font-weight: 950;
   line-height: 1;
   text-decoration: none;
 }
 
-.credits-title:hover,
-.credits-panel a:hover {
-  text-decoration: underline;
+.credits-copy {
+  display: grid;
+  justify-items: center;
+  row-gap: 17px;
 }
 
-.credits-panel p {
-  margin: 1vw 0 0;
+.credits-section {
+  display: grid;
+  justify-items: center;
+  row-gap: 9px;
+  width: 100%;
+}
+
+.credits-line {
+  margin: 0;
   color: #79564d;
-  font-size: clamp(0.92rem, 1.18vw, 1.14rem);
+  font-size: clamp(1rem, 1.58vw, 1.12rem);
   font-weight: 850;
-  line-height: 1.35;
+  line-height: 1.28;
 }
 
-.credits-panel p span,
-.credits-panel p a {
-  display: block;
+.credits-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
 }
 
-.credits-panel a:not(.credits-title) {
-  color: #9e5f7a;
-  font-weight: 950;
-  font-size: 1.08em;
+.credits-link,
+.credits-copy a.credits-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: #1d5f9f;
+  background: rgba(229, 243, 255, 0.9);
+  box-shadow:
+    inset 0 0 0 1px rgba(79, 145, 209, 0.34),
+    0 8px 14px rgba(78, 98, 128, 0.1);
+  font-size: clamp(0.86rem, 1.18vw, 0.96rem);
+  font-weight: 850;
+  line-height: 1.05;
   text-decoration: none;
+  white-space: nowrap;
+}
+
+.credits-link:hover,
+.credits-copy a.credits-link:hover {
+  color: #164e88;
+  background: rgba(213, 235, 255, 0.96);
+  text-decoration: none;
+}
+
+.credits-link:focus-visible,
+.credits-copy a.credits-link:focus-visible {
+  outline: 3px solid rgba(74, 135, 196, 0.55);
+  outline-offset: 3px;
 }
 
 .credits-close {
   position: absolute;
-  top: 0.7vw;
-  right: 0.8vw;
-  width: 1.75vw;
-  min-width: 28px;
+  top: 14px;
+  right: 15px;
+  width: 34px;
   aspect-ratio: 1;
   border: 0;
   border-radius: 999px;
@@ -3363,25 +3374,50 @@
 
 @media (max-width: 760px) and (orientation: portrait) {
   .credits-panel {
-    width: min(92%, 620px);
-    padding: clamp(16px, 4.4vw, 22px) clamp(18px, 5.1vw, 26px) clamp(17px, 4.7vw, 23px);
-    border-radius: 26px 28px 24px 30px;
+    width: min(90%, 340px);
+    max-height: none;
+    padding: 31px 15px 16px;
+    overflow: visible;
+    border-radius: 24px 26px 22px 28px;
   }
 
   .credits-title {
     white-space: nowrap;
-    font-size: clamp(0.9rem, 4.15vw, 1.18rem);
+    margin-bottom: 10px;
+    font-size: clamp(1.16rem, 5.45vw, 1.45rem);
     line-height: 1;
   }
 
-  .credits-panel p {
-    margin-top: clamp(9px, 2.6vw, 13px);
-    font-size: clamp(0.74rem, 3.25vw, 0.92rem);
-    line-height: 1.22;
+  .credits-copy {
+    row-gap: 7px;
   }
 
-  .credits-panel a:not(.credits-title) {
-    font-size: 1.04em;
+  .credits-section {
+    row-gap: 4px;
+  }
+
+  .credits-line {
+    font-size: clamp(0.68rem, 3vw, 0.78rem);
+    line-height: 1.14;
+  }
+
+  .credits-link,
+  .credits-copy a.credits-link {
+    min-height: 24px;
+    padding: 4px 8px;
+    font-size: clamp(0.62rem, 2.6vw, 0.7rem);
+  }
+
+  .credits-link-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+  }
+
+  .credits-close {
+    top: 7px;
+    right: 8px;
+    width: 27px;
   }
 
   .concept-panel {

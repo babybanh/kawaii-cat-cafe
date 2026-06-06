@@ -67,6 +67,15 @@ const POINTS_STREAK_BONUS = 6
 const SHOW_LAYOUT_BOXES = false
 const SHOW_INGREDIENT_HITBOXES = false
 const SHOW_CHARACTER_ANCHORS = false
+const CREDIT_LINKS = {
+  gameTitle: 'Kawaii Cat Cafe',
+  studentName: 'Janelle Y.',
+  performanceUrl: 'https://youtu.be/-HrfhpKqa1M?si=AvwrTodbaiPvLMZg',
+  developerUrl: 'https://www.coastal.edu/academics/facultyprofiles/humanities/music/lebinhanhnguyen/',
+  magazineUrl: 'https://kids.pianoinspires.com/magazine/',
+  playlistUrl: 'https://youtube.com/playlist?list=PLhhleIn9mEjhNAztK55u86m13lu6xpqoM&si=QUe8safgKSOMwsG5',
+  contestName: 'Piano Inspires Kids Composition Contest',
+} as const
 
 type LayoutTargetMode = 'move' | 'resize'
 type LayoutEditSession = {
@@ -577,7 +586,7 @@ function App() {
     }
 
     const keepMusicAlive = () => {
-      if (!gameStarted || document.hidden) {
+      if (!gameStarted || modalOpen || document.hidden) {
         return
       }
 
@@ -597,7 +606,26 @@ function App() {
       window.removeEventListener('pointerdown', keepMusicAlive, { capture: true })
       window.removeEventListener('keydown', keepMusicAlive, { capture: true })
     }
-  }, [gameStarted, musicEnabled, playBackgroundMusic])
+  }, [gameStarted, modalOpen, musicEnabled, playBackgroundMusic])
+
+  useEffect(() => {
+    if (!modalOpen) {
+      return
+    }
+
+    const closeModalOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') {
+        return
+      }
+
+      setCreditsOpen(false)
+      setConceptOpen(false)
+    }
+
+    window.addEventListener('keydown', closeModalOnEscape)
+
+    return () => window.removeEventListener('keydown', closeModalOnEscape)
+  }, [modalOpen])
 
   useEffect(() => {
     const pauseMusicForBackground = (event: Event) => {
@@ -648,19 +676,27 @@ function App() {
       return
     }
 
-    setMochiPetInstruction((current) => getRandomMochiPetPrompt(current))
+    const petInstructionTimer = window.setTimeout(() => {
+      setMochiPetInstruction((current) => getRandomMochiPetPrompt(current))
+    }, 0)
 
     const focusTimer = window.setTimeout(() => {
       setMochiFocusOverlay(true)
     }, MOCHI_FOCUS_OVERLAY_DELAYS_MS[mochiTimerStep] ?? MOCHI_FOCUS_OVERLAY_DELAYS_MS[MOCHI_FOCUS_OVERLAY_DELAYS_MS.length - 1])
 
-    return () => window.clearTimeout(focusTimer)
+    return () => {
+      window.clearTimeout(petInstructionTimer)
+      window.clearTimeout(focusTimer)
+    }
   }, [catNeedsPet, mochiTimerStep])
 
   useEffect(() => {
     if (!serveFocusEligible || catNeedsPet || modalOpen) {
-      setServeFocusOverlay(false)
-      return
+      const resetTimer = window.setTimeout(() => {
+        setServeFocusOverlay(false)
+      }, 0)
+
+      return () => window.clearTimeout(resetTimer)
     }
 
     const focusTimer = window.setTimeout(() => {
@@ -1641,29 +1677,43 @@ function App() {
                 <button type="button" className="credits-close" aria-label="Close credits" onClick={() => setCreditsOpen(false)}>
                   x
                 </button>
-                <a
+                <h2
                   id="credits-title"
                   className="credits-title"
-                  href="https://youtube.com/playlist?list=PLhhleIn9mEjhNAztK55u86m13lu6xpqoM&si=QUe8safgKSOMwsG5"
-                  target="_blank"
-                  rel="noreferrer"
                 >
-                  PIK Composition Contest 2026
-                </a>
-                <p>
-                  <span>Original music and characters by</span>
-                  <a
-                    href="https://youtu.be/-HrfhpKqa1M?si=AvwrTodbaiPvLMZg"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Janelle Y.
-                  </a>
-                </p>
-                <p>
-                  <span>Game design and development by</span>
-                  <a href="mailto:binhanhpiano96@gmail.com">Le Binh Anh Nguyen</a>
-                </p>
+                  {CREDIT_LINKS.gameTitle}
+                </h2>
+                <div className="credits-copy">
+                  <section className="credits-section" aria-label="Music and characters credit">
+                    <p className="credits-line">
+                      Music and characters by {CREDIT_LINKS.studentName}
+                    </p>
+                    <a className="credits-link" href={CREDIT_LINKS.performanceUrl} target="_blank" rel="noreferrer">
+                      Watch performance
+                    </a>
+                  </section>
+                  <section className="credits-section" aria-label="Game creator credit">
+                    <p className="credits-line">
+                      Game created by Le Binh Anh Nguyen
+                    </p>
+                    <a className="credits-link" href={CREDIT_LINKS.developerUrl} target="_blank" rel="noreferrer">
+                      Visit website
+                    </a>
+                  </section>
+                  <section className="credits-section" aria-label="Contest links">
+                    <p className="credits-line">
+                      From the {CREDIT_LINKS.contestName}
+                    </p>
+                    <div className="credits-link-row">
+                      <a className="credits-link" href={CREDIT_LINKS.magazineUrl} target="_blank" rel="noreferrer">
+                        Read the magazine
+                      </a>
+                      <a className="credits-link" href={CREDIT_LINKS.playlistUrl} target="_blank" rel="noreferrer">
+                        Watch winners playlist
+                      </a>
+                    </div>
+                  </section>
+                </div>
               </div>
             </div>
           ) : null}
