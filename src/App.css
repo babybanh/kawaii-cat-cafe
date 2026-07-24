@@ -3773,6 +3773,16 @@
     display: block;
   }
 
+  .game-stage .prep-copy.mochi-prompt strong {
+    font-weight: 600;
+    line-height: 1.02;
+  }
+
+  .game-stage .akari-thought-bubble.cat strong {
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
   .game-stage .stage-title {
     font-size: clamp(0.94rem, 3.65vw, 1.55rem);
   }
