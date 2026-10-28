@@ -454,6 +454,8 @@ function App() {
           }
 
           musicGapTimerRef.current = window.setTimeout(() => {
+            musicGapTimerRef.current = null
+            if (!musicEnabledRef.current || document.hidden) return
             void backgroundAudio
               .play()
               .then(() => {
@@ -965,6 +967,10 @@ function App() {
     setMusicEnabled(nextEnabled)
 
     if (!nextEnabled) {
+      if (musicGapTimerRef.current) {
+        window.clearTimeout(musicGapTimerRef.current)
+        musicGapTimerRef.current = null
+      }
       musicRef.current?.pause()
       setMusicStarted(false)
       showToast('Music off', 'hint')

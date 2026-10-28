@@ -23,3 +23,5 @@ TODO:
 - Replaced all 24 ingredient and recipe-layer PNGs with the May15 updated artwork set from `~/Downloads/Kawaii Cat Cafe - Images May15`. Verified every replacement is 1254x1254. QA: `npm run build`, `npm run lint`, `npm test`, Browser screenshot check, and web-game smoke screenshot passed.
 
 - Implemented coded-in approved layout defaults, split prep into editable prep art/hit/hint/finish targets, raised art scale max to 5, fixed ingredient wiggle/shake to preserve image scale, centered Mochi click behavior, and added a 3-heart Mochi mood gate. QA: `npm run build`, `npm run lint`, `npm test`, Browser DOM/console/screenshot checks, edit-target visibility, and three-recipe Mochi mood flow passed.
+
+- October 27 reliability review: traced staged loading and asset-quality history; preserved both. Added HTML preload hints for room/table/Mochi and guarded/cancelled delayed music restart when muted or hidden. Build, lint, 8 existing tests, Chromium/WebKit reload/audio flows, and first-recipe browser flow passed. Physical phone verification remains pending.
